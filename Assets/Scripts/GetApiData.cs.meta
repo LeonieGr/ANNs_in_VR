@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: d7bf3b133063b4153bf3879f0e11a74e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - Conv2DPrefab: {fileID: 6267594678125975911, guid: d8df6aeabc10a4c54ad6a0a46543a331,
+      type: 3}
+  - MaxPooling2DPrefab: {fileID: 3080485735717151243, guid: 851453c3f10db4798ae6378979d23e2f,
+      type: 3}
+  - DensePrefab: {fileID: 5945465148786971488, guid: 678d4b088af554ec58e4657bebfd2a41,
+      type: 3}
+  - FlattenPrefab: {fileID: 8365987953143731685, guid: aea7a77dedf734bb2bf36dce631c9bd7,
+      type: 3}
+  - DropoutPrefab: {fileID: 5946612379287792056, guid: 11c632ef01b0d48df9ad0d40354d81a0,
+      type: 3}
+  - TestObject: {fileID: 765575175065428695, guid: 83bce24f656e84d2f89ac594441e1683,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
