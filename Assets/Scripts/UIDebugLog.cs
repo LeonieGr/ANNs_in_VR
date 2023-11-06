@@ -10,7 +10,7 @@ public class UIDebugLog : MonoBehaviour
 {
     public TextMeshProUGUI DebugText;
 
-    private Text exceptionText; // Reference to the Text component on your UI panel.
+    private Text exceptionText;
 
     private void Start()
     {
@@ -20,11 +20,11 @@ public class UIDebugLog : MonoBehaviour
         try
         {
             // Call the GetAPIData method that might throw an exception.
-            StartCoroutine(SendWebRequest("http://172.22.31.194:4999/layer_info")); // Replace with your API URL.
+            StartCoroutine(SendWebRequest("http://172.22.31.194:4999/layer_info"));
         }
         catch (Exception e)
         {
-            // Handle the exception by displaying it on the TextMeshPro Text component.
+            // Handle the exception by displaying it
             if (exceptionText != null)
             {
                 exceptionText.text = "Exception: " + e.Message;
@@ -36,7 +36,7 @@ public class UIDebugLog : MonoBehaviour
     {
         if (type == LogType.Exception || type == LogType.Error)
         {
-            // Display the exception message on the TextMeshPro Text component.
+            // Display the exception message
             if (exceptionText != null)
             {
                 exceptionText.text = logMessage + "\n" + stackTrace;

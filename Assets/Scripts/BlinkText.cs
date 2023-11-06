@@ -8,7 +8,7 @@ public class BlinkText : MonoBehaviour
 {
     
     public TextMeshProUGUI textToBlink;
-    public float blinkInterval = 1.0f; // Time in seconds between blinks
+    public float blinkInterval = 1.0f; // Time between blinks
 
     private void Start()
     {

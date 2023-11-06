@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections;
-using UnityEngine.Networking; // Import the necessary namespace for UnityWebRequest
+using UnityEngine.Networking;
 
 public class ConnectionHandler : MonoBehaviour
 {
