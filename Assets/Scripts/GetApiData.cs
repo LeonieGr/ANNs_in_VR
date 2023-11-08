@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 public class GetApiData : MonoBehaviour
 {
 
-    private string apiUrl = "http://172.22.27.191:4999/layer_info"; 
+    private string apiUrl = "http://192.168.2.33:4999/layer_info"; 
 
     // Prefabs for different types of layers
     public GameObject Conv2DPrefab;
@@ -61,26 +61,16 @@ public class GetApiData : MonoBehaviour
         StartCoroutine(GetLayerInfo());
         Debug.Log("GetLayerInfo method is running.");
 
-        //Works
-        //Instantiate(TestObject, transform.position, Quaternion.identity);
-
     }
 
     // fetch layer information 
     IEnumerator GetLayerInfo()
     {
-        // works
-        //Instantiate(TestObject, transform.position, Quaternion.identity);
 
         using (UnityWebRequest webRequest = UnityWebRequest.Get(apiUrl))
         {
-            // works 
-            // Instantiate(TestObject, transform.position, Quaternion.identity);
 
             yield return webRequest.SendWebRequest();
-
-            //works
-            //Instantiate(TestObject, transform.position, Quaternion.identity);
 
             if (webRequest.result != UnityWebRequest.Result.Success)
             {
@@ -88,9 +78,6 @@ public class GetApiData : MonoBehaviour
             }
             else
             {
-                //stops working at this point
-                //Instantiate(TestObject, transform.position, Quaternion.identity);
-
                 // Parse the JSON response
                 string jsonText = webRequest.downloadHandler.text;
 
@@ -107,8 +94,6 @@ public class GetApiData : MonoBehaviour
                 }
             }
 
-            //works
-            //Instantiate(TestObject, transform.position, Quaternion.identity);
         }
     }
 
@@ -116,7 +101,7 @@ public class GetApiData : MonoBehaviour
     void InstantiateLayers(LayerInfo[] layers)
     {
 
-        int i = 0;
+        int i = 1;
         foreach (LayerInfo layer in layers)
         {
 
@@ -124,7 +109,7 @@ public class GetApiData : MonoBehaviour
 
             if (classToPrefab.TryGetValue(layer.class_name, out GameObject prefab))
             {
-                GameObject instantiatedObject = Instantiate(prefab, new Vector3(i * 2f, 2f, -5f), Quaternion.Euler(0f, 90f, 0f));
+                GameObject instantiatedObject = Instantiate(prefab, new Vector3(0f, 2f, -i +-3f), Quaternion.Euler(0f, 0f, 0f));
                 Debug.Log("PrefabInstatiated");
 
                 SetLayerSize(layer, instantiatedObject);
@@ -143,7 +128,7 @@ public class GetApiData : MonoBehaviour
             if (layer.output_shape.Length >= 3)
             {
                 // Use output_shape values to adjust the size
-                newScale = new Vector3(layer.output_shape[1] * 0.2f, layer.output_shape[2] * 0.2f, 1f);
+                newScale = new Vector3(layer.output_shape[1] * 0.1f, layer.output_shape[2] * 0.1f, 0.3f);
             }
             else if (layer.class_name == "Dense")
             {

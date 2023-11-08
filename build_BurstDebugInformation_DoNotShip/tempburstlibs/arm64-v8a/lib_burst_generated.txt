@@ -131,7 +131,6 @@ Library: /Users/leonie/Desktop/VR_Krams/BA_project/Temp/StagingArea/tempburstlib
 --compilation-defines=XR_HANDS_1_1_OR_NEWER
 --compilation-defines=XR_MANAGEMENT_4_0_OR_NEWER
 --compilation-defines=OPENXR_1_6_OR_NEWER
---compilation-defines=DISABLE_BUILTIN_INPUT_SYSTEM_OCULUS
 --compilation-defines=UNITY_INPUT_SYSTEM_ENABLE_VR
 --compilation-defines=UNITY_INPUT_SYSTEM_ENABLE_XR
 --compilation-defines=UNITY_INPUT_SYSTEM_ENABLE_PHYSICS
@@ -149,8 +148,6 @@ Library: /Users/leonie/Desktop/VR_Krams/BA_project/Temp/StagingArea/tempburstlib
 --compilation-defines=MODULE_PHYSICS_EXISTS
 --compilation-defines=MODULE_PHYSICS_2D_EXISTS
 --compilation-defines=MODULE_PARTICLE_SYSTEM_EXISTS
---compilation-defines=UNITY_INPUT_SYSTEM
---compilation-defines=XR_MGMT_GTE_320
 --compilation-defines=UNITY_OPENXR_PACKAGE
 --compilation-defines=UNITY_OPENXR_PACKAGE_1_2
 --compilation-defines=UNITY_OPENXR_PACKAGE_1_6
@@ -164,6 +161,7 @@ Library: /Users/leonie/Desktop/VR_Krams/BA_project/Temp/StagingArea/tempburstlib
 --compilation-defines=INPUT_SYSTEM_POSE_VALID
 --compilation-defines=INPUT_SYSTEM_BINDING_VALIDATOR
 --compilation-defines=TIMELINE_FRAMEACCURATE
+--compilation-defines=UNITY_INPUT_SYSTEM
 --generate-link-xml=Temp/burst.link.xml
 --temp-folder=/Users/leonie/Desktop/VR_Krams/BA_project/Temp/Burst
 --key-folder=/Applications/Unity/Hub/Editor/2021.3.30f1/PlaybackEngines/AndroidPlayer
