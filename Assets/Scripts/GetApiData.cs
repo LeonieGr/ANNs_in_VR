@@ -5,10 +5,11 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 
+// GetApiData fetches and visualizes layer information from a specified API endpoint
 public class GetApiData : MonoBehaviour
 {
 
-    private string apiUrl = "http://192.168.2.33:4999/layer_info"; 
+    private string apiUrl = "http://172.22.29.196:4999/layer_info"; 
 
     // Prefabs for different types of layers
     public GameObject Conv2DPrefab;
@@ -18,15 +19,15 @@ public class GetApiData : MonoBehaviour
     public GameObject DropoutPrefab;
     public GameObject TestObject;
     
-    // default sizes 
-    float defaultDenseHeight = 5f; 
-    float defaultDenseWidth = 0.5f; 
-    float defaultDenseDepth = 0.3f; 
-    Vector3 defaultDenseSize = new Vector3(0.5f, 5f, 0.3f);
-    Vector3 defaultFlattenSize = new Vector3(0.5f, 4f, 0.3f);
+
+    // Conversion factors to translate layer dimensions into Unity units
+    private float pixelToUnit = 0.15f;
+    private float featureMapToUnit = 0.03f; 
+    private float neuronToUnit = 0.0002f; 
 
 
-    // hold layer information from API
+
+    // Holds layer information from API
     [Serializable]
     public class LayerInfo
     {
@@ -46,6 +47,7 @@ public class GetApiData : MonoBehaviour
 
     //Dictionary to map class names to prefabs
     Dictionary<string, GameObject> classToPrefab = new Dictionary<string, GameObject>();
+
     void Awake()
     {
         // Initialize
@@ -58,12 +60,13 @@ public class GetApiData : MonoBehaviour
 
     void Start()
     { 
+        // Begin API call
         StartCoroutine(GetLayerInfo());
         Debug.Log("GetLayerInfo method is running.");
 
     }
 
-    // fetch layer information 
+    // Coroutine to fetch layer information from API
     IEnumerator GetLayerInfo()
     {
 
@@ -78,12 +81,13 @@ public class GetApiData : MonoBehaviour
             }
             else
             {
-                // Parse the JSON response
+                // On success, Parse the JSON response
                 string jsonText = webRequest.downloadHandler.text;
 
                 // Create a wrapper object for the JSON array
                 LayerInfoList layerInfoList = JsonUtility.FromJson<LayerInfoList>("{\"layers\":" + jsonText + "}");
 
+                // If response is valid, inistiate layers
                 if (layerInfoList != null && layerInfoList.layers != null)
                 {
                     InstantiateLayers(layerInfoList.layers);
@@ -97,61 +101,80 @@ public class GetApiData : MonoBehaviour
         }
     }
 
-    // Instantiate objects for each layer based on the retrieved information
+    // Instantiate the layers
     void InstantiateLayers(LayerInfo[] layers)
     {
+        float zPosition = -2f; // Initial z position for the first layer
+        float spaceBetweenLayers = 1f;
+        float annDepth = 0f; // To calculate the total depth of the ANN
 
-        int i = 1;
+        // Instantiate all layers and calculate the collective depth
+        List<GameObject> instantiatedLayers = new List<GameObject>();
         foreach (LayerInfo layer in layers)
         {
-
-                Debug.Log($"Layer Name: {layer.name}, Class: {layer.class_name}, Output Shape: {string.Join(", ", layer.output_shape)}");
-
             if (classToPrefab.TryGetValue(layer.class_name, out GameObject prefab))
             {
-                GameObject instantiatedObject = Instantiate(prefab, new Vector3(0f, 2f, -i +-3f), Quaternion.Euler(0f, 0f, 0f));
-                Debug.Log("PrefabInstatiated");
-
-                SetLayerSize(layer, instantiatedObject);
-                i++;
-            }
-        }
-    }
-
-    // Set the size of the instantiated object based on layer information
-    void SetLayerSize(LayerInfo layer, GameObject instantiatedObject)
-    {
-        Vector3 newScale;
-        // Check the number of elements in the output_shape
-        if (layer.output_shape != null)                  
-        {
-            if (layer.output_shape.Length >= 3)
-            {
-                // Use output_shape values to adjust the size
-                newScale = new Vector3(layer.output_shape[1] * 0.1f, layer.output_shape[2] * 0.1f, 0.3f);
-            }
-            else if (layer.class_name == "Dense")
-            {
-                // Use the height from output_shape and default width and depth
-                float height = layer.output_shape.Length > 1 ? layer.output_shape[1] * 0.01f : defaultDenseHeight;
-                newScale = new Vector3(defaultDenseWidth, height, defaultDenseDepth);
-            }
-            else if (layer.class_name == "Flatten")
-            {
-                // Use default size for Flatten layer
-                newScale = defaultFlattenSize;
+                GameObject layerObject = Instantiate(prefab);
+                SetLayerSize(layer, layerObject);
+                annDepth += layerObject.transform.localScale.z + spaceBetweenLayers;
+                instantiatedLayers.Add(layerObject);
             }
             else
             {
-                // Handle other cases if needed
-                newScale = new Vector3(1f, 1f, 1f);
+                Debug.LogError($"Prefab for class {layer.class_name} not found.");
+            }
+        }
+
+        // Subtract the last added space as there is no layer after the last one
+        annDepth -= spaceBetweenLayers;
+
+        // Check if the ANN model exceeds the boundaries and scale down if necessary
+        float maxDepth = 17f; // Assuming -2 to -19 Z space boundary
+        float scaleFactor = annDepth > maxDepth ? maxDepth / annDepth : 1f;
+
+        // Create a parent object to hold all layers
+        GameObject annParent = new GameObject("ANNModel");
+
+        // Now position the layers and apply the scaling factor if needed
+        foreach (GameObject layerObject in instantiatedLayers)
+        {
+            layerObject.transform.SetParent(annParent.transform);
+            layerObject.transform.localScale *= scaleFactor; // Apply scaling factor
+            layerObject.transform.localPosition = new Vector3(0f, 2.5f, zPosition - (layerObject.transform.localScale.z / 2f * scaleFactor));
+            zPosition -= (layerObject.transform.localScale.z * scaleFactor + spaceBetweenLayers);
+        }
+    }
+
+    // Set layer size based on the layers output shape
+    void SetLayerSize(LayerInfo layer, GameObject instantiatedObject)
+        {
+            Vector3 newScale;
+
+            if (layer.class_name == "Conv2D" || layer.class_name == "MaxPooling2D")
+            {
+                // Scaling for Conv2D and MaxPooling2D layers
+                newScale = new Vector3(
+                    layer.output_shape[1] * pixelToUnit, // X
+                    layer.output_shape[2] * pixelToUnit, // Y
+                    layer.output_shape[3] * featureMapToUnit // Z
+                );
+            }
+            else if (layer.class_name == "Flatten" || layer.class_name == "Dense" || layer.class_name == "Dropout")
+            {
+                // Scaling for Flatten, Dense, and Dropout layers
+                newScale = new Vector3(
+                    1f, // X
+                    1f, // Y
+                    layer.output_shape[1] * neuronToUnit // Z
+                );
+            }
+            else
+            {
+                newScale = new Vector3(1f, 1f, 1f); // Default scale for any other type of layer
             }
 
-            // Set the scale of the GameObject
             instantiatedObject.transform.localScale = newScale;
-
-        }            
-    }
+        }
 
 
     void HandleError(string errorMessage)
