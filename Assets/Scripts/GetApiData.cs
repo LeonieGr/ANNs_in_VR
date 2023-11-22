@@ -9,7 +9,7 @@ using UnityEngine.Networking;
 public class GetApiData : MonoBehaviour
 {
 
-    private string apiUrl = "http://172.22.26.233:4999/layer_info"; 
+    private string apiUrl = "http://172.22.26.200:4999/layer_info"; 
 
     // Prefabs for different types of layers
     public GameObject Conv2DPrefab;
@@ -22,8 +22,8 @@ public class GetApiData : MonoBehaviour
 
     // Conversion factors to translate layer dimensions into Unity units
     private float pixelToUnit = 0.04f;
-    private float featureMapToUnit = 0.03f; 
-    private float neuronToUnit = 0.0002f; 
+   // private float featureMapToUnit = 0.03f; 
+   // private float neuronToUnit = 0.0002f; 
 
 
 
@@ -238,11 +238,13 @@ void InstantiateLayers(LayerInfo[] layers)
     GameObject annParent = new GameObject("ANNModel");
     List<GameObject> instantiatedLayers = new List<GameObject>();
 
-    foreach (LayerInfo layer in layers)
+    for (int i = 0; i < layers.Length; i++)
     {
+        LayerInfo layer = layers[i];
         GameObject layerParent = CreateLayerParent(layer, zPosition);
         instantiatedLayers.Add(layerParent);
-        InstantiateLayerComponents(layer, layerParent);
+        bool isLastLayer = (i==layers.Length -1);
+        InstantiateLayerComponents(layer, layerParent,isLastLayer);
         UpdateLayerDepth(ref annDepth, layerParent, spaceBetweenLayers, ref zPosition);
     }
 
@@ -257,11 +259,15 @@ GameObject CreateLayerParent(LayerInfo layer, float zPosition)
     return layerParent;
 }
 
-void InstantiateLayerComponents(LayerInfo layer, GameObject layerParent)
+void InstantiateLayerComponents(LayerInfo layer, GameObject layerParent, bool isLastLayer)
 {
     if (classToPrefab.TryGetValue(layer.class_name, out GameObject prefab))
     {
-        if (IsDenseDropoutFlattenLayer(layer))
+         if (isLastLayer)
+        {
+            InstantiateLastLayerNeurons(layer, prefab, layerParent);
+        }
+        else if (IsDenseDropoutFlattenLayer(layer))
         {
             InstantiateNeurons(layer, prefab, layerParent);
         }
@@ -269,6 +275,7 @@ void InstantiateLayerComponents(LayerInfo layer, GameObject layerParent)
         {
             InstantiateFeatureMaps(layer, prefab, layerParent);
         }
+       
     }
     else
     {
@@ -317,6 +324,26 @@ void InstantiateFeatureMaps(LayerInfo layer, GameObject prefab, GameObject layer
         featureMapBox.transform.localPosition = new Vector3(startX + col * (boxWidth + spacing), row * (boxWidth + spacing), 0);
     }
 }
+
+void InstantiateLastLayerNeurons(LayerInfo layer, GameObject prefab, GameObject layerParent)
+{
+    int numberOfNeurons = layer.output_shape[1];
+    float horizontalSpacing = 1.0f; // Adjust as needed
+    float neuronWidth = 1.0f; // Assuming each neuron has a width of 1 unit, adjust as needed
+    float totalLayerWidth = numberOfNeurons * neuronWidth + (numberOfNeurons - 1) * horizontalSpacing;
+    float startX = -totalLayerWidth / 2 + neuronWidth / 2;
+
+    for (int i = 0; i < numberOfNeurons; i++)
+    {
+        GameObject neuron = Instantiate(prefab, parent: layerParent.transform);
+        neuron.transform.localPosition = new Vector3(startX + i * (neuronWidth + horizontalSpacing), 0, 0);
+
+        // Apply a different scale for the last layer neurons, if needed
+        float neuronScaleFactor = 1f; // Adjust as needed
+        neuron.transform.localScale = new Vector3(neuronScaleFactor, neuronScaleFactor, neuronScaleFactor);
+    }
+}
+
 
 void ApplySelectiveScaling(LayerInfo[] layers, List<GameObject> instantiatedLayers)
 {
