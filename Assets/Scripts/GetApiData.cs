@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.XR.Interaction.Toolkit;
+using TMPro;
+
 
 
 // GetApiData fetches and visualizes layer information from a specified API endpoint
@@ -25,6 +27,8 @@ public class GetApiData : MonoBehaviour
 
     // Material of hovered layers
     public Material hoverMaterial;
+    public GameObject uiWindow; // UI Window to show on trigger
+    public TextMeshProUGUI typeText, indexText, outputShapeText;
 
     // Holds layer information from API
     [Serializable]
@@ -100,134 +104,6 @@ public class GetApiData : MonoBehaviour
         }
     }
 
-    // Instantiate the layers
-   /* void InstantiateLayers(LayerInfo[] layers)
-    {
-        float zPosition = -2f; // Initial z position for the first layer
-        float spaceBetweenLayers = 1f;
-        float annDepth = 0f; // To calculate the total depth of the ANN
-
-        // Instantiate all layers and calculate the collective depth
-        List<GameObject> instantiatedLayers = new List<GameObject>();
-        foreach (LayerInfo layer in layers)
-        {
-            GameObject layerParent = new GameObject(layer.class_name + "Layer");
-            layerParent.transform.localPosition = new Vector3(-5, 2.5f, zPosition);
-            instantiatedLayers.Add(layerParent);
-            annDepth += layerParent.transform.localScale.z + spaceBetweenLayers;
-
-            if (classToPrefab.TryGetValue(layer.class_name, out GameObject prefab))
-            {
-
-                if (layer.class_name == "Dense" || layer.class_name == "Dropout" || layer.class_name == "Flatten")
-                {
-                    int numberOfNeurons = layer.output_shape[1];
-                    float verticalSpacing = 0.15f;
-                    
-                    if (numberOfNeurons>50)
-                    {
-                        numberOfNeurons = 50;
-                    }
-            
-                    for (int i = 0; i < numberOfNeurons; i++)
-                    {
-                        GameObject neuron = Instantiate(prefab, parent: layerParent.transform);
-                        // Position each neuron in a vertical line, adjusting only the y-coordinate
-                        neuron.transform.localPosition = new Vector3(0, i * verticalSpacing, 0);
-
-                    }
-                }
-
-                if (layer.class_name == "Conv2D" || layer.class_name == "MaxPooling2D")
-                {
-                    int pixel = layer.output_shape[1];
-                    int featureMaps = layer.output_shape[3];
-                    int dimension = Mathf.CeilToInt(Mathf.Sqrt(featureMaps)); // Rows and columns based on square root of feature maps
-                    float spacing = pixel*0.01f;
-                    float boxWidth = pixel * pixelToUnit;
-                    float totalRowWidth = dimension * boxWidth + (dimension - 1) * spacing;
-                    float startX = -totalRowWidth / 2 + boxWidth / 2; // Starting X position for the first box
-
-
-                    for (int i = 0; i<featureMaps; i++)
-                    {
-                        int row = i / dimension;
-                        int col = i % dimension;
-                        GameObject featureMapBox = Instantiate(prefab, parent: layerParent.transform);
-                        featureMapBox.transform.localScale = new Vector3(pixel * pixelToUnit, pixel * pixelToUnit, 0.3f);
-                        featureMapBox.transform.localPosition = new Vector3(startX + col * (boxWidth + spacing), row * (boxWidth + spacing), 0);
-                    }
-
-                }
-            }
-            else
-            {
-                Debug.LogError($"Prefab for class {layer.class_name} not found.");
-            }
-        }
-
-        float SigmoidScale(float x)
-        {
-            float a = 6.0f; // Adjust 'a' to control how steep the curve is
-            float scaleLimit = 0.8f; // The maximum scale factor
-
-            return scaleLimit / (1.0f + Mathf.Exp(-a * (x - 0.5f)));
-        }
-        
-        for (int i = 0; i < instantiatedLayers.Count; i++)
-        {
-            GameObject layerParent = instantiatedLayers[i];
-            LayerInfo layerInfo = layers[i];
-
-            if (layerInfo.class_name == "Conv2D" || layerInfo.class_name == "MaxPooling2D")
-            {
-                float layerSize = CalculateLayerSize(layerParent);
-                float layerScaleFactor = SigmoidScale(layerSize);
-                layerParent.transform.localScale = new Vector3(layerScaleFactor, layerScaleFactor, layerScaleFactor);
-            }
-        }
-
-
-        float CalculateLayerSize(GameObject layerParent)
-        {
-            Renderer[] renderers = layerParent.GetComponentsInChildren<Renderer>();
-            if (renderers.Length == 0)
-            {
-                return 0f;
-            }
-
-            Bounds bounds = renderers[0].bounds;
-            foreach (Renderer renderer in renderers)
-            {
-                bounds.Encapsulate(renderer.bounds);
-            }
-
-            // Return the size of the bounds in the x dimension (width)
-            return bounds.size.x;
-        }
-
-                
-
-        // Subtract the last added space as there is no layer after the last one
-        annDepth -= spaceBetweenLayers;
-
-        // Check if the ANN model exceeds the boundaries and scale down if necessary
-        float maxDepth = 17f; // Assuming -2 to -19 Z space boundary
-        float scaleFactor = annDepth > maxDepth ? maxDepth / annDepth : 1f;
-        
-        // Create a parent object to hold all layers
-        GameObject annParent = new GameObject("ANNModel");
-
-        // Now position the layers and apply the scaling factor if needed
-        foreach (GameObject layerObject in instantiatedLayers)
-        {
-            layerObject.transform.SetParent(annParent.transform);
-            layerObject.transform.localScale *= scaleFactor; // Apply scaling factor
-            layerObject.transform.localPosition = new Vector3(0f, 2.5f, zPosition - (layerObject.transform.localScale.z / 2f * scaleFactor));
-            zPosition -= (layerObject.transform.localScale.z * scaleFactor + spaceBetweenLayers);
-
-        }
-    }*/
 
     void InstantiateLayers(LayerInfo[] layers)
     {
@@ -254,7 +130,7 @@ public class GetApiData : MonoBehaviour
 
             ConfigureInteractable(interactable);
             ConfigureRigidbody(rigidbody);
-            ConfigureInteractionScript(interactionScript);
+            ConfigureInteractionScript(interactionScript, layer);
 
 
         }
@@ -462,9 +338,20 @@ public class GetApiData : MonoBehaviour
        // interactable.onSelectEntered.AddListener((args) => OnLayerSelected(args));
     }
 
-    void ConfigureInteractionScript(LayerInteraction interactionScript)
+    void ConfigureInteractionScript(LayerInteraction interactionScript, LayerInfo layer)
     {
         interactionScript.hoverMaterial = hoverMaterial;
+        interactionScript.typeText =  typeText;
+        interactionScript.indexText = indexText;
+        interactionScript.outputShapeText = outputShapeText;
+        interactionScript.uiWindow = uiWindow;
+        interactionScript.layerInfo = layer;
+
+    }
+    
+    string ArrayToString(int[] array)
+    {
+        return "[" + string.Join(", ", array) + "]";
     }
 
     void OnLayerSelected(SelectEnterEventArgs args)
@@ -486,3 +373,133 @@ public class GetApiData : MonoBehaviour
     }
 }
 
+
+
+    // Instantiate the layers
+   /* void InstantiateLayers(LayerInfo[] layers)
+    {
+        float zPosition = -2f; // Initial z position for the first layer
+        float spaceBetweenLayers = 1f;
+        float annDepth = 0f; // To calculate the total depth of the ANN
+
+        // Instantiate all layers and calculate the collective depth
+        List<GameObject> instantiatedLayers = new List<GameObject>();
+        foreach (LayerInfo layer in layers)
+        {
+            GameObject layerParent = new GameObject(layer.class_name + "Layer");
+            layerParent.transform.localPosition = new Vector3(-5, 2.5f, zPosition);
+            instantiatedLayers.Add(layerParent);
+            annDepth += layerParent.transform.localScale.z + spaceBetweenLayers;
+
+            if (classToPrefab.TryGetValue(layer.class_name, out GameObject prefab))
+            {
+
+                if (layer.class_name == "Dense" || layer.class_name == "Dropout" || layer.class_name == "Flatten")
+                {
+                    int numberOfNeurons = layer.output_shape[1];
+                    float verticalSpacing = 0.15f;
+                    
+                    if (numberOfNeurons>50)
+                    {
+                        numberOfNeurons = 50;
+                    }
+            
+                    for (int i = 0; i < numberOfNeurons; i++)
+                    {
+                        GameObject neuron = Instantiate(prefab, parent: layerParent.transform);
+                        // Position each neuron in a vertical line, adjusting only the y-coordinate
+                        neuron.transform.localPosition = new Vector3(0, i * verticalSpacing, 0);
+
+                    }
+                }
+
+                if (layer.class_name == "Conv2D" || layer.class_name == "MaxPooling2D")
+                {
+                    int pixel = layer.output_shape[1];
+                    int featureMaps = layer.output_shape[3];
+                    int dimension = Mathf.CeilToInt(Mathf.Sqrt(featureMaps)); // Rows and columns based on square root of feature maps
+                    float spacing = pixel*0.01f;
+                    float boxWidth = pixel * pixelToUnit;
+                    float totalRowWidth = dimension * boxWidth + (dimension - 1) * spacing;
+                    float startX = -totalRowWidth / 2 + boxWidth / 2; // Starting X position for the first box
+
+
+                    for (int i = 0; i<featureMaps; i++)
+                    {
+                        int row = i / dimension;
+                        int col = i % dimension;
+                        GameObject featureMapBox = Instantiate(prefab, parent: layerParent.transform);
+                        featureMapBox.transform.localScale = new Vector3(pixel * pixelToUnit, pixel * pixelToUnit, 0.3f);
+                        featureMapBox.transform.localPosition = new Vector3(startX + col * (boxWidth + spacing), row * (boxWidth + spacing), 0);
+                    }
+
+                }
+            }
+            else
+            {
+                Debug.LogError($"Prefab for class {layer.class_name} not found.");
+            }
+        }
+
+        float SigmoidScale(float x)
+        {
+            float a = 6.0f; // Adjust 'a' to control how steep the curve is
+            float scaleLimit = 0.8f; // The maximum scale factor
+
+            return scaleLimit / (1.0f + Mathf.Exp(-a * (x - 0.5f)));
+        }
+        
+        for (int i = 0; i < instantiatedLayers.Count; i++)
+        {
+            GameObject layerParent = instantiatedLayers[i];
+            LayerInfo layerInfo = layers[i];
+
+            if (layerInfo.class_name == "Conv2D" || layerInfo.class_name == "MaxPooling2D")
+            {
+                float layerSize = CalculateLayerSize(layerParent);
+                float layerScaleFactor = SigmoidScale(layerSize);
+                layerParent.transform.localScale = new Vector3(layerScaleFactor, layerScaleFactor, layerScaleFactor);
+            }
+        }
+
+
+        float CalculateLayerSize(GameObject layerParent)
+        {
+            Renderer[] renderers = layerParent.GetComponentsInChildren<Renderer>();
+            if (renderers.Length == 0)
+            {
+                return 0f;
+            }
+
+            Bounds bounds = renderers[0].bounds;
+            foreach (Renderer renderer in renderers)
+            {
+                bounds.Encapsulate(renderer.bounds);
+            }
+
+            // Return the size of the bounds in the x dimension (width)
+            return bounds.size.x;
+        }
+
+                
+
+        // Subtract the last added space as there is no layer after the last one
+        annDepth -= spaceBetweenLayers;
+
+        // Check if the ANN model exceeds the boundaries and scale down if necessary
+        float maxDepth = 17f; // Assuming -2 to -19 Z space boundary
+        float scaleFactor = annDepth > maxDepth ? maxDepth / annDepth : 1f;
+        
+        // Create a parent object to hold all layers
+        GameObject annParent = new GameObject("ANNModel");
+
+        // Now position the layers and apply the scaling factor if needed
+        foreach (GameObject layerObject in instantiatedLayers)
+        {
+            layerObject.transform.SetParent(annParent.transform);
+            layerObject.transform.localScale *= scaleFactor; // Apply scaling factor
+            layerObject.transform.localPosition = new Vector3(0f, 2.5f, zPosition - (layerObject.transform.localScale.z / 2f * scaleFactor));
+            zPosition -= (layerObject.transform.localScale.z * scaleFactor + spaceBetweenLayers);
+
+        }
+    }*/
