@@ -7,7 +7,6 @@ using UnityEngine.UI;
 using TMPro;
 
 
-
 public class LayerInteraction : MonoBehaviour
 {
     public Material hoverMaterial; // Shared hover material for all layers

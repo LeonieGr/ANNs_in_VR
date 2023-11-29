@@ -20,7 +20,7 @@ public class UIDebugLog : MonoBehaviour
         try
         {
             // Call the GetAPIData method that might throw an exception.
-            StartCoroutine(SendWebRequest("http://172.22.26.200:4999/layer_info"));
+            StartCoroutine(SendWebRequest("http://172.22.27.9:4999/layer_info"));
         }
         catch (Exception e)
         {

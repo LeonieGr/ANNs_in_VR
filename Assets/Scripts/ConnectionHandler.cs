@@ -4,7 +4,7 @@ using UnityEngine.Networking;
 
 public class ConnectionHandler : MonoBehaviour
 {
-    public string urlToCheck = "http://172.22.26.200:4999/layer_info";
+    public string urlToCheck = "http://172.22.27.9:4999/layer_info";
     public GameObject successObject;
     public GameObject failureObject;
 
