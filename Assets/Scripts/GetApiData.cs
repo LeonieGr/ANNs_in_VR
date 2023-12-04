@@ -8,10 +8,11 @@ using TMPro;
 
 
 // GetApiData fetches and visualizes layer information from a specified API endpoint
-public class GetApiData : MonoBehaviour
-{
+public class GetApiData : MonoBehaviour {
 
-    private string apiUrl = "http://172.22.27.9:4999/layer_info"; 
+    private string apiUrl = "http://172.22.31.68:4999/sequential/layer_info"; 
+    // Conversion factor to translate layer dimensions into Unity units
+    private float pixelToUnit = 0.04f;
 
     // Prefabs for different types of layers
     public GameObject Conv2DPrefab;
@@ -21,18 +22,17 @@ public class GetApiData : MonoBehaviour
     public GameObject DropoutPrefab;
     public GameObject TestObject;    
 
-    // Conversion factor to translate layer dimensions into Unity units
-    private float pixelToUnit = 0.04f;
-
     // Material of hovered layers
     public Material hoverMaterial;
     public GameObject uiWindow; // UI Window to show on trigger
     public TextMeshProUGUI typeText, indexText, outputShapeText;
 
+    // Dictionary to map class names to prefabs
+    public Dictionary<string, GameObject> classToPrefab = new Dictionary<string, GameObject>();
+
     // Holds layer information from API
     [Serializable]
-    public class LayerInfo
-    {
+    public class LayerInfo {
         public string class_name;
         public int index;
         public string name;
@@ -42,16 +42,11 @@ public class GetApiData : MonoBehaviour
 
     // Holds layers
     [Serializable]
-    public class LayerInfoList
-    {
+    public class LayerInfoList {
         public LayerInfo[] layers;
     }
 
-    // Dictionary to map class names to prefabs
-    Dictionary<string, GameObject> classToPrefab = new Dictionary<string, GameObject>();
-
-    void Awake()
-    {
+    void Awake() {
         // Initialize
         classToPrefab["Conv2D"] = Conv2DPrefab;
         classToPrefab["MaxPooling2D"] = MaxPooling2DPrefab;
@@ -60,8 +55,7 @@ public class GetApiData : MonoBehaviour
         classToPrefab["Dropout"] = DropoutPrefab;
     }
 
-    void Start()
-    { 
+    void Start() { 
         // Begin API call
         StartCoroutine(GetLayerInfo());
         Debug.Log("GetLayerInfo method is running.");
@@ -69,21 +63,16 @@ public class GetApiData : MonoBehaviour
     }
 
     // Coroutine to fetch layer information from API
-    IEnumerator GetLayerInfo()
-    {
+    IEnumerator GetLayerInfo() {
         
         // GET request to the API
-        using (UnityWebRequest webRequest = UnityWebRequest.Get(apiUrl))
-        {
+        using (UnityWebRequest webRequest = UnityWebRequest.Get(apiUrl)) {
             // waiting for request to complete
             yield return webRequest.SendWebRequest();
 
-            if (webRequest.result != UnityWebRequest.Result.Success)
-            {
+            if (webRequest.result != UnityWebRequest.Result.Success) {
                 Debug.LogError("Error: " + webRequest.error);
-            }
-            else
-            {
+            } else {
                 // On success, Parse the JSON response
                 string jsonText = webRequest.downloadHandler.text;
 
@@ -91,22 +80,17 @@ public class GetApiData : MonoBehaviour
                 LayerInfoList layerInfoList = JsonUtility.FromJson<LayerInfoList>("{\"layers\":" + jsonText + "}");
 
                 // If response is valid, inistiate layers
-                if (layerInfoList != null && layerInfoList.layers != null)
-                {
+                if (layerInfoList != null && layerInfoList.layers != null) {
                     InstantiateLayers(layerInfoList.layers);
-                }
-                else
-                {
+                } else {
                     HandleError("Invalid JSON response.");
                 }
             }
-
         }
     }
 
     // Method to instantiate layer visuals
-    void InstantiateLayers(LayerInfo[] layers)
-    {
+    void InstantiateLayers(LayerInfo[] layers) {
         // Initial settings for positioning layers in 3D space
         float zPosition = 13f;
         float spaceBetweenLayers = 1f;
@@ -115,8 +99,7 @@ public class GetApiData : MonoBehaviour
         List<GameObject> instantiatedLayers = new List<GameObject>();
 
         // Iterate through each layer and instantiate its visual representation
-        for (int i = 0; i < layers.Length; i++)
-        {
+        for (int i = 0; i < layers.Length; i++) {
             LayerInfo layer = layers[i];
             GameObject layerParent = CreateLayerParent(layer, zPosition);
             instantiatedLayers.Add(layerParent);
@@ -142,68 +125,79 @@ public class GetApiData : MonoBehaviour
     }
 
     // Create a parent object for each layer for better organization in the scene
-    GameObject CreateLayerParent(LayerInfo layer, float zPosition)
-    {
+    GameObject CreateLayerParent(LayerInfo layer, float zPosition) {
         GameObject layerParent = new GameObject(layer.class_name + "Layer");
         layerParent.transform.localPosition = new Vector3(-5, 1f, zPosition);
         return layerParent;
     }
 
     // Instantiate specific components of a layer based on its type
-    void InstantiateLayerComponents(LayerInfo layer, GameObject layerParent, bool isLastLayer)
-    {
+    void InstantiateLayerComponents(LayerInfo layer, GameObject layerParent, bool isLastLayer) {
         // Check for the layer type and instantiate the appropriate visual components
-        if (classToPrefab.TryGetValue(layer.class_name, out GameObject prefab))
-        {
-            if (isLastLayer)
-            {
-                InstantiateLastLayerNeurons(layer, prefab, layerParent);
+        if (classToPrefab.TryGetValue(layer.class_name, out GameObject prefab)) {
+            if (IsDenseDropoutFlattenLayer(layer)) {
+                InstantiateNeurons(layer, prefab, layerParent, isLastLayer);
             }
-            else if (IsDenseDropoutFlattenLayer(layer))
-            {
-                InstantiateNeurons(layer, prefab, layerParent);
-            }
-            else if (IsConvOrPoolingLayer(layer))
-            {
+            else if (IsConvOrPoolingLayer(layer)) {
                 InstantiateFeatureMaps(layer, prefab, layerParent);
             }
-        }
-        else
-        {
+        } else {
             Debug.LogError($"Prefab for class {layer.class_name} not found.");
         }
     }
 
     // Check if the layer is of type Dense, Dropout, or Flatten
-    bool IsDenseDropoutFlattenLayer(LayerInfo layer)
-    {
+    bool IsDenseDropoutFlattenLayer(LayerInfo layer) {
         return layer.class_name == "Dense" || layer.class_name == "Dropout" || layer.class_name == "Flatten";
     }
 
     // Check if the layer is of type Conv2D or MaxPooling2D
-    bool IsConvOrPoolingLayer(LayerInfo layer)
-    {
+    bool IsConvOrPoolingLayer(LayerInfo layer) {
         return layer.class_name == "Conv2D" || layer.class_name == "MaxPooling2D";
     }
 
-    // Instantiate neurons for a given layer
-    void InstantiateNeurons(LayerInfo layer, GameObject prefab, GameObject layerParent)
-    {
-        // Determine the number of neurons and their spacing
-        int numberOfNeurons = Mathf.Min(layer.output_shape[1], 50);
-        float verticalSpacing = 0.2f;
+    // Instantiate neurons as a particle system for a given layer
+    void InstantiateNeurons(LayerInfo layer, GameObject prefab, GameObject layerParent, bool isLastLayer) {
 
-        // Create each neuron as a child of the layer parent
-        for (int i = 0; i < numberOfNeurons; i++)
-        {
-            GameObject neuron = Instantiate(prefab, parent: layerParent.transform);
-            neuron.transform.localPosition = new Vector3(0, i * verticalSpacing, 0);
-        }
+        // Determine the number of neurons
+        int numberOfNeurons = layer.output_shape[1];
+
+        // Instantiate the prefab with the particle system
+        GameObject neuronSystem = Instantiate(prefab, parent: layerParent.transform);
+        neuronSystem.transform.localPosition = new Vector3(0, 3, 0);
+
+        // Get the particle system components of the children
+        ParticleSystem[] particleSystemArray = neuronSystem.GetComponentsInChildren<ParticleSystem>();
+
+        if (particleSystemArray != null  && particleSystemArray.Length > 0) {
+            ParticleSystem particleSystem = particleSystemArray[0];
+
+            // Access to modules in particle system and configure values as needed
+            var mainModule = particleSystem.main;
+            var emissionModule = particleSystem.emission;
+            var shapeModule = particleSystem.shape;
+            var particleRenderer = particleSystem.GetComponent<ParticleSystemRenderer>();
+
+            mainModule.maxParticles = numberOfNeurons;
+            mainModule.startLifetime = Mathf.Infinity;
+            mainModule.startSpeed = 0f;
+            emissionModule.rateOverTime = 0f;
+
+            // Special handeling for last layer: horizontal, increased size, lower positioning
+            if (isLastLayer) {
+                neuronSystem.transform.localPosition = new Vector3(0, 1, 0);
+                shapeModule.rotation = new Vector3(shapeModule.rotation.x, shapeModule.rotation.y, 0f);
+                particleRenderer.maxParticleSize = 0.07f;
+            }
+
+            // Configure a burst to emit the exact number of particles once
+            ParticleSystem.Burst burst = new ParticleSystem.Burst(0.0f, (short)numberOfNeurons);
+            emissionModule.SetBursts(new ParticleSystem.Burst[] { burst });
+        }  
     }
 
     // Instantiate feature maps for convolutional and pooling layers
-    void InstantiateFeatureMaps(LayerInfo layer, GameObject prefab, GameObject layerParent)
-    {
+    void InstantiateFeatureMaps(LayerInfo layer, GameObject prefab, GameObject layerParent) {
         int pixel = layer.output_shape[1];
         int featureMaps = layer.output_shape[3];
         int dimension = Mathf.CeilToInt(Mathf.Sqrt(featureMaps));
@@ -212,8 +206,7 @@ public class GetApiData : MonoBehaviour
         float totalRowWidth = dimension * boxWidth + (dimension - 1) * spacing;
         float startX = -totalRowWidth / 2 + boxWidth / 2;
 
-        for (int i = 0; i < featureMaps; i++)
-        {
+        for (int i = 0; i < featureMaps; i++) {
             int row = i / dimension;
             int col = i % dimension;
             GameObject featureMapBox = Instantiate(prefab, parent: layerParent.transform);
@@ -222,32 +215,10 @@ public class GetApiData : MonoBehaviour
         }
     }
 
-    // Instantiate neurons specifically for the last layer
-    void InstantiateLastLayerNeurons(LayerInfo layer, GameObject prefab, GameObject layerParent)
-    {
-        int numberOfNeurons = Mathf.Min(layer.output_shape[1], 50);
-        float horizontalSpacing = 1.0f; // Adjust as needed
-        float neuronWidth = 0.7f; // Assuming each neuron has a width of 1 unit, adjust as needed
-        float totalLayerWidth = numberOfNeurons * neuronWidth + (numberOfNeurons - 1) * horizontalSpacing;
-        float startX = -totalLayerWidth / 2 + neuronWidth / 2;
-
-        for (int i = 0; i < numberOfNeurons; i++)
-        {
-            GameObject neuron = Instantiate(prefab, parent: layerParent.transform);
-            neuron.transform.localPosition = new Vector3(startX + i * (neuronWidth + horizontalSpacing), 0, 0);
-
-            // Apply a different scale for the last layer neurons, if needed
-            float neuronScaleFactor = 0.7f; // Adjust as needed
-            neuron.transform.localScale = new Vector3(neuronScaleFactor, neuronScaleFactor, neuronScaleFactor);
-        }
-    }
-
     // Add a collider to the layer for interaction purposes
-    void AddColliderToLayer(GameObject layerObject)
-    {
+    void AddColliderToLayer(GameObject layerObject) {
         // Check if the object has a renderer to determine if a collider is needed
-        if (layerObject.GetComponent<Renderer>() == null && layerObject.GetComponentsInChildren<Renderer>().Length == 0)
-        {
+        if (layerObject.GetComponent<Renderer>() == null && layerObject.GetComponentsInChildren<Renderer>().Length == 0) {
             // No renderer found, may not need a collider or cannot calculate bounds
             return;
         }
@@ -259,13 +230,11 @@ public class GetApiData : MonoBehaviour
     }
 
     // Calculate the bounds size for the collider based on renderers
-    Vector3 CalculateBoundsSize(GameObject layerObject)
-    {
+    Vector3 CalculateBoundsSize(GameObject layerObject) {
         Bounds bounds = new Bounds(layerObject.transform.position, Vector3.zero);
 
         // Expand the bounds to include all child renderers
-        foreach (Renderer renderer in layerObject.GetComponentsInChildren<Renderer>())
-        {
+        foreach (Renderer renderer in layerObject.GetComponentsInChildren<Renderer>()) {
             bounds.Encapsulate(renderer.bounds);
         }
 
@@ -274,11 +243,9 @@ public class GetApiData : MonoBehaviour
     }
 
     // Calculate the center of the bounds for the collider
-    Vector3 CalculateBoundsCenter(GameObject layerObject)
-    {
+    Vector3 CalculateBoundsCenter(GameObject layerObject) {
         Bounds bounds = new Bounds(layerObject.transform.position, Vector3.zero);
-        foreach (Renderer renderer in layerObject.GetComponentsInChildren<Renderer>())
-        {
+        foreach (Renderer renderer in layerObject.GetComponentsInChildren<Renderer>()) {
             bounds.Encapsulate(renderer.bounds);
         }
         
@@ -287,13 +254,10 @@ public class GetApiData : MonoBehaviour
     }
 
 
-    void ApplySelectiveScaling(LayerInfo[] layers, List<GameObject> instantiatedLayers)
-    { 
-        for (int i = 0; i < instantiatedLayers.Count; i++)
-        {
+    void ApplySelectiveScaling(LayerInfo[] layers, List<GameObject> instantiatedLayers) { 
+        for (int i = 0; i < instantiatedLayers.Count; i++) {
             // Apply scaling only to convolutional or pooling layers
-            if (IsConvOrPoolingLayer(layers[i]))
-            {
+            if (IsConvOrPoolingLayer(layers[i])) {
                 // Calculate layer size and apply a sigmoid-based scaling factor
                 float layerSize = CalculateLayerSize(instantiatedLayers[i]);
                 float layerScaleFactor = SigmoidScale(layerSize);
@@ -303,18 +267,15 @@ public class GetApiData : MonoBehaviour
     }
 
     // Calculate the size of a layer based on its renderers
-    float CalculateLayerSize(GameObject layerParent)
-    {
+    float CalculateLayerSize(GameObject layerParent) {
         // Obtain all renderers and calculate the combined bounds
         Renderer[] renderers = layerParent.GetComponentsInChildren<Renderer>();
-        if (renderers.Length == 0)
-        {
+        if (renderers.Length == 0) {
             return 0f;
         }
 
         Bounds bounds = renderers[0].bounds;
-        foreach (Renderer renderer in renderers)
-        {
+        foreach (Renderer renderer in renderers) {
             bounds.Encapsulate(renderer.bounds);
         }
         // Return the size in a specific dimension (x-axis in this case)
@@ -322,8 +283,7 @@ public class GetApiData : MonoBehaviour
     }
 
     // Sigmoid function for scaling layer size
-    float SigmoidScale(float x)
-    {
+    float SigmoidScale(float x) {
         float a = 6.0f; // Steepness
         float scaleLimit = 0.8f; // Upper limit of the scale factor
         // Sigmoid funtion for smooth scaling
@@ -331,24 +291,21 @@ public class GetApiData : MonoBehaviour
     }
 
     // Update the depth and position of each layer in the ANN model
-    void UpdateLayerDepth(ref float annDepth, GameObject layerParent, float spaceBetweenLayers, ref float zPosition)
-    {
+    void UpdateLayerDepth(ref float annDepth, GameObject layerParent, float spaceBetweenLayers, ref float zPosition) {
         // Increment the depth and adjust the zPosition for the next layer
         annDepth += layerParent.transform.localScale.z + spaceBetweenLayers;
         zPosition -= layerParent.transform.localScale.z + spaceBetweenLayers;
     }
 
     // Position all layers within the ANN model and apply scaling if necessary
-    void PositionLayers(List<GameObject> instantiatedLayers, GameObject annParent, ref float zPosition, float spaceBetweenLayers, ref float annDepth)
-    {
+    void PositionLayers(List<GameObject> instantiatedLayers, GameObject annParent, ref float zPosition, float spaceBetweenLayers, ref float annDepth) {
         // Maximum allowable depth for the model
         float maxDepth = 17f;
         // Calculate the scaling factor based on the total depth and max depth
         float scaleFactor = CalculateScaleFactor(annDepth, maxDepth);
 
         // Apply the scaling and positioning with adjusted zPosition to each layer
-        foreach (GameObject layerObject in instantiatedLayers)
-        {
+        foreach (GameObject layerObject in instantiatedLayers) {
             layerObject.transform.SetParent(annParent.transform);
             layerObject.transform.localScale *= scaleFactor;
             layerObject.transform.localPosition = new Vector3(0f, 1f, zPosition - (layerObject.transform.localScale.z / 2f * scaleFactor));
@@ -360,20 +317,17 @@ public class GetApiData : MonoBehaviour
     }
 
     // Calculate the scaling factor based on actual and maximum depth
-    float CalculateScaleFactor(float annDepth, float maxDepth)
-    {
+    float CalculateScaleFactor(float annDepth, float maxDepth) {
         // Scale down if the total depth exceeds the maximum, else use actual size
         return annDepth > maxDepth ? maxDepth / annDepth : 1f;
     }
 
-    void ConfigureInteractable(XRSimpleInteractable interactable)
-    {
+    void ConfigureInteractable(XRSimpleInteractable interactable) {
         // Configure interactable properties
     }
 
     // Configure the interaction script for a layer
-    void ConfigureInteractionScript(LayerInteraction interactionScript, LayerInfo layer)
-    {
+    void ConfigureInteractionScript(LayerInteraction interactionScript, LayerInfo layer) {
         interactionScript.hoverMaterial = hoverMaterial;
         interactionScript.typeText =  typeText;
         interactionScript.indexText = indexText;
@@ -383,21 +337,18 @@ public class GetApiData : MonoBehaviour
 
     }
     
-    string ArrayToString(int[] array)
-    {
+    string ArrayToString(int[] array) {
         return "[" + string.Join(", ", array) + "]";
     }
 
 
-    void ConfigureRigidbody(Rigidbody rigidbody)
-    {
+    void ConfigureRigidbody(Rigidbody rigidbody) {
         // Set Rigidbody properties
         rigidbody.isKinematic = true; // don't want the layer to be affected by physics forces
         rigidbody.useGravity = false;
     }
 
-    void HandleError(string errorMessage)
-    {
+    void HandleError(string errorMessage){
         Debug.LogError(errorMessage);
     }
 }

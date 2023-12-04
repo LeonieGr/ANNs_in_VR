@@ -997,16 +997,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7bf3b133063b4153bf3879f0e11a74e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Conv2DPrefab: {fileID: 6267594678125975911, guid: d8df6aeabc10a4c54ad6a0a46543a331,
-    type: 3}
-  MaxPooling2DPrefab: {fileID: 3080485735717151243, guid: 851453c3f10db4798ae6378979d23e2f,
-    type: 3}
-  DensePrefab: {fileID: 5945465148786971488, guid: 678d4b088af554ec58e4657bebfd2a41,
-    type: 3}
-  FlattenPrefab: {fileID: 8365987953143731685, guid: aea7a77dedf734bb2bf36dce631c9bd7,
-    type: 3}
-  DropoutPrefab: {fileID: 5946612379287792056, guid: 11c632ef01b0d48df9ad0d40354d81a0,
-    type: 3}
+  Conv2DPrefab: {fileID: 0}
+  MaxPooling2DPrefab: {fileID: 0}
+  DensePrefab: {fileID: 0}
+  FlattenPrefab: {fileID: 0}
+  DropoutPrefab: {fileID: 0}
   TestObject: {fileID: 0}
   hoverMaterial: {fileID: 0}
   uiWindow: {fileID: 0}
@@ -4766,14 +4761,13 @@ MonoBehaviour:
     type: 3}
   MaxPooling2DPrefab: {fileID: 3080485735717151243, guid: 851453c3f10db4798ae6378979d23e2f,
     type: 3}
-  DensePrefab: {fileID: 5945465148786971488, guid: 678d4b088af554ec58e4657bebfd2a41,
+  DensePrefab: {fileID: 4307431497365312717, guid: eb2e6d0c766d24b0c97a96e82602acc4,
     type: 3}
-  FlattenPrefab: {fileID: 8365987953143731685, guid: aea7a77dedf734bb2bf36dce631c9bd7,
+  FlattenPrefab: {fileID: 4123759476094002488, guid: a1003390932e94625941047a44146279,
     type: 3}
-  DropoutPrefab: {fileID: 5946612379287792056, guid: 11c632ef01b0d48df9ad0d40354d81a0,
+  DropoutPrefab: {fileID: 4123759476094002488, guid: fd68677dc6f71458fac8ed1ed5e81e8d,
     type: 3}
-  TestObject: {fileID: 765575175065428695, guid: 83bce24f656e84d2f89ac594441e1683,
-    type: 3}
+  TestObject: {fileID: 0}
   hoverMaterial: {fileID: 2100000, guid: 958676e2b6cfd46ceb1a8e3f591ed3f9, type: 2}
   uiWindow: {fileID: 540678588}
   typeText: {fileID: 3377278829688677145}
@@ -10557,7 +10551,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 28578493d3a3f4e2489ab75194cbb3e9, type: 2}
+  - {fileID: 2100000, guid: 0867e17d6539949c49d588eaab607a34, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -10609,7 +10603,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 699469258}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 38f6bf3d943ac7945842268c9ef1dca6, type: 3}
   m_Name: 

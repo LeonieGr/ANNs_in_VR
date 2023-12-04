@@ -5,8 +5,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.InputSystem;
 
 
-public class ActivateTeleportationRay : MonoBehaviour
-{
+public class ActivateTeleportationRay : MonoBehaviour {
     public GameObject leftTeleportation;
     public GameObject rightTeleportation;
 
@@ -21,8 +20,7 @@ public class ActivateTeleportationRay : MonoBehaviour
 
 
     // activates the teleportation ray on controller input
-    void Update()
-    {
+    void Update() {
         //bool isLeftRayHovering = leftRay.TryGetHitInfo(out Vector3 leftPos, out Vector3 leftNormal, out int leftNumber, out bool leftValid);
         //leftTeleportation.SetActive(!isLeftRayHovering && leftCancel.action.ReadValue<float>() == 0 && leftActivate.action.ReadValue<float>() > 0.1f);
        
@@ -32,7 +30,6 @@ public class ActivateTeleportationRay : MonoBehaviour
        //rightTeleportation.SetActive(!isRightRayHovering && rightCancel.action.ReadValue<float>() == 0 && rightActivate.action.ReadValue<float>()> 0.1f);
        
         rightTeleportation.SetActive(rightActivate.action.ReadValue<float>()> 0.1f);
-
     }
 }
 
