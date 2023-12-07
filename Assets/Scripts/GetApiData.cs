@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -10,7 +11,14 @@ using TMPro;
 // GetApiData fetches and visualizes layer information from a specified API endpoint
 public class GetApiData : MonoBehaviour {
 
-    private string apiUrl = "http://172.22.31.68:4999/sequential/layer_info"; 
+    private string apiUrl; //= "http://172.22.27.118:4999/autoencoder/layer_info"; 
+    private Dictionary<string, string> modelUrls = new Dictionary<string, string>{
+        {"None",""},
+        {"Sequential", "http://192.168.2.104:4999/sequential/layer_info"},
+        {"Autoencoder", "http://192.168.2.104:4999/autoencoder/layer_info"},
+        {"VGG", "http://192.168.2.104:4999/vgg/layer_info"}
+    };
+
     // Conversion factor to translate layer dimensions into Unity units
     private float pixelToUnit = 0.04f;
 
@@ -20,12 +28,19 @@ public class GetApiData : MonoBehaviour {
     public GameObject DensePrefab;
     public GameObject FlattenPrefab;
     public GameObject DropoutPrefab;
-    public GameObject TestObject;    
+    public GameObject InputPrefab;
+    public GameObject ReshapePrefab;
+    public GameObject UpSampling2DPrefab;
+    public GameObject ConcatenatePrefab;     
 
     // Material of hovered layers
     public Material hoverMaterial;
     public GameObject uiWindow; // UI Window to show on trigger
     public TextMeshProUGUI typeText, indexText, outputShapeText;
+
+    //Dropdown menu to choose model
+    public TMP_Dropdown modelDropdownEN;
+    public TMP_Dropdown modelDropdownDE; 
 
     // Dictionary to map class names to prefabs
     public Dictionary<string, GameObject> classToPrefab = new Dictionary<string, GameObject>();
@@ -33,10 +48,11 @@ public class GetApiData : MonoBehaviour {
     // Holds layer information from API
     [Serializable]
     public class LayerInfo {
+        public string activation = null;
         public string class_name;
         public int index;
         public string name;
-        public int[] output_shape;
+        public int[] output_shape ;
         public int parameters;
     }
 
@@ -53,13 +69,43 @@ public class GetApiData : MonoBehaviour {
         classToPrefab["Dense"] = DensePrefab;
         classToPrefab["Flatten"] = FlattenPrefab;
         classToPrefab["Dropout"] = DropoutPrefab;
+        classToPrefab["InputLayer"] = InputPrefab;
+        classToPrefab["Reshape"] = ReshapePrefab;
+        classToPrefab["UpSampling2D"] = UpSampling2DPrefab;
+        classToPrefab["Concatenate"] = ConcatenatePrefab;
+
     }
 
     void Start() { 
         // Begin API call
-        StartCoroutine(GetLayerInfo());
+        InitializeDropdown(modelDropdownDE);
+        InitializeDropdown(modelDropdownEN);
+        //StartCoroutine(GetLayerInfo());
         Debug.Log("GetLayerInfo method is running.");
 
+    }
+
+    private void InitializeDropdown(TMP_Dropdown dropdown) {
+        dropdown.ClearOptions();
+        List<string> options = new List<string>(modelUrls.Keys);
+        dropdown.AddOptions(options);
+        dropdown.onValueChanged.AddListener(delegate {
+            DropdownValueChanged(dropdown);
+        });
+    }
+
+    // Method to be called when the dropdown value changes
+    void DropdownValueChanged(TMP_Dropdown dropdown) {
+
+        if (!dropdown.gameObject.activeInHierarchy) return; // Ignore inactive dropdown
+
+        string selectedModel = dropdown.options[dropdown.value].text;
+        if (modelUrls.TryGetValue(selectedModel, out string url)) {
+            apiUrl = url;
+            StartCoroutine(GetLayerInfo()); // Fetch new data
+        } else {
+            Debug.LogError("URL for selected model not found.");
+        }
     }
 
     // Coroutine to fetch layer information from API
@@ -92,7 +138,7 @@ public class GetApiData : MonoBehaviour {
     // Method to instantiate layer visuals
     void InstantiateLayers(LayerInfo[] layers) {
         // Initial settings for positioning layers in 3D space
-        float zPosition = 13f;
+        float zPosition = 0f;
         float spaceBetweenLayers = 1f;
         float annDepth = 0f;
         GameObject annParent = new GameObject("ANNModel");
@@ -115,13 +161,13 @@ public class GetApiData : MonoBehaviour {
 
             ConfigureInteractable(interactable);
             ConfigureRigidbody(rigidbody);
-            ConfigureInteractionScript(interactionScript, layer);
+            ConfigureInteractionScript(interactionScript, layer, layerParent);
 
         }
 
         // Apply scaling and positioning
-        ApplySelectiveScaling(layers, instantiatedLayers);
-        PositionLayers(instantiatedLayers, annParent, ref zPosition, spaceBetweenLayers, ref annDepth);
+         ApplySelectiveScaling(layers, instantiatedLayers);
+         PositionLayers(instantiatedLayers, annParent, ref zPosition, spaceBetweenLayers, ref annDepth);
     }
 
     // Create a parent object for each layer for better organization in the scene
@@ -153,7 +199,7 @@ public class GetApiData : MonoBehaviour {
 
     // Check if the layer is of type Conv2D or MaxPooling2D
     bool IsConvOrPoolingLayer(LayerInfo layer) {
-        return layer.class_name == "Conv2D" || layer.class_name == "MaxPooling2D";
+        return layer.class_name == "Conv2D" || layer.class_name == "MaxPooling2D" || layer.class_name == "Concatenate" || layer.class_name == "UpSampling2D" || layer.class_name == "Reshape" || layer.class_name == "InputLayer";
     }
 
     // Instantiate neurons as a particle system for a given layer
@@ -185,7 +231,7 @@ public class GetApiData : MonoBehaviour {
 
             // Special handeling for last layer: horizontal, increased size, lower positioning
             if (isLastLayer) {
-                neuronSystem.transform.localPosition = new Vector3(0, 1, 0);
+                neuronSystem.transform.localPosition = new Vector3(0, 0, 0);
                 shapeModule.rotation = new Vector3(shapeModule.rotation.x, shapeModule.rotation.y, 0f);
                 particleRenderer.maxParticleSize = 0.07f;
             }
@@ -198,20 +244,25 @@ public class GetApiData : MonoBehaviour {
 
     // Instantiate feature maps for convolutional and pooling layers
     void InstantiateFeatureMaps(LayerInfo layer, GameObject prefab, GameObject layerParent) {
-        int pixel = layer.output_shape[1];
-        int featureMaps = layer.output_shape[3];
-        int dimension = Mathf.CeilToInt(Mathf.Sqrt(featureMaps));
-        float spacing = pixel * 0.01f;
-        float boxWidth = pixel * pixelToUnit;
-        float totalRowWidth = dimension * boxWidth + (dimension - 1) * spacing;
-        float startX = -totalRowWidth / 2 + boxWidth / 2;
+        if (layer.output_shape != null) {
 
-        for (int i = 0; i < featureMaps; i++) {
-            int row = i / dimension;
-            int col = i % dimension;
-            GameObject featureMapBox = Instantiate(prefab, parent: layerParent.transform);
-            featureMapBox.transform.localScale = new Vector3(boxWidth, boxWidth, 0.3f);
-            featureMapBox.transform.localPosition = new Vector3(startX + col * (boxWidth + spacing), row * (boxWidth + spacing), 0);
+            int pixel = layer.output_shape[1];
+            int featureMaps = layer.output_shape[3];
+            int dimension = Mathf.CeilToInt(Mathf.Sqrt(featureMaps));
+            float spacing = pixel * 0.01f;
+            float boxWidth = pixel * pixelToUnit;
+            float totalRowWidth = dimension * boxWidth + (dimension - 1) * spacing;
+            float startX = -totalRowWidth / 2 + boxWidth / 2;
+
+            for (int i = 0; i < featureMaps; i++) {
+                int row = i / dimension;
+                int col = i % dimension;
+                GameObject featureMapBox = Instantiate(prefab, parent: layerParent.transform);
+                featureMapBox.transform.localScale = new Vector3(boxWidth, boxWidth, 0.3f);
+                featureMapBox.transform.localPosition = new Vector3(startX + col * (boxWidth + spacing), row * (boxWidth + spacing), 0);
+            }
+        } else {
+            Debug.Log("invalid outputshape");
         }
     }
 
@@ -260,8 +311,18 @@ public class GetApiData : MonoBehaviour {
             if (IsConvOrPoolingLayer(layers[i])) {
                 // Calculate layer size and apply a sigmoid-based scaling factor
                 float layerSize = CalculateLayerSize(instantiatedLayers[i]);
-                float layerScaleFactor = SigmoidScale(layerSize);
-                instantiatedLayers[i].transform.localScale = new Vector3(layerScaleFactor, layerScaleFactor, layerScaleFactor);
+                Debug.Log(layerSize); // bound size
+                float layerScaleFactor = SigmoidScale(layerSize); 
+                float adjustmentFactor = 10.0f / layerSize;
+                //layerScaleFactor *= adjustmentFactor;
+                 Debug.Log("Factor:" + layerScaleFactor);
+
+
+                Vector3 currentScale = instantiatedLayers[i].transform.localScale;
+                instantiatedLayers[i].transform.localScale = new Vector3(  
+                    currentScale.x * layerScaleFactor,
+                    currentScale.y * layerScaleFactor,
+                    currentScale.z * layerScaleFactor);
             }
         }
     }
@@ -279,15 +340,36 @@ public class GetApiData : MonoBehaviour {
             bounds.Encapsulate(renderer.bounds);
         }
         // Return the size in a specific dimension (x-axis in this case)
-        return bounds.size.x;
+        return bounds.size.x; 
+
+       /* Transform[] childTransforms = layerParent.GetComponentsInChildren<Transform>();
+        if (childTransforms.Length == 0) {
+            return 0f;
+        }
+
+        float maxSizeX = childTransforms[0].localScale.x;
+        foreach (Transform childTransform in childTransforms) {
+            maxSizeX = Mathf.Max(maxSizeX, childTransform.localScale.x);
+        }
+
+        // Return the maximum size in the x-axis
+        return maxSizeX;*/
+
     }
 
     // Sigmoid function for scaling layer size
     float SigmoidScale(float x) {
-        float a = 6.0f; // Steepness
-        float scaleLimit = 0.8f; // Upper limit of the scale factor
+        float a = 2.0f; // Steepness
+        float scaleLimit = 1f; // Upper limit of the scale factor
+        float normalizedX = x / 9.0f;
+        float minValue = 0.1f;
         // Sigmoid funtion for smooth scaling
-        return scaleLimit / (1.0f + Mathf.Exp(-a * (x - 0.5f)));
+        float scaleValue = scaleLimit - (scaleLimit / (1.0f + Mathf.Exp(-a * (normalizedX - 0.5f))));
+        if (scaleValue > minValue) {
+            return scaleValue;
+        } else {
+            return minValue;
+        }
     }
 
     // Update the depth and position of each layer in the ANN model
@@ -300,16 +382,18 @@ public class GetApiData : MonoBehaviour {
     // Position all layers within the ANN model and apply scaling if necessary
     void PositionLayers(List<GameObject> instantiatedLayers, GameObject annParent, ref float zPosition, float spaceBetweenLayers, ref float annDepth) {
         // Maximum allowable depth for the model
-        float maxDepth = 17f;
+        float maxDepth = 27f;
         // Calculate the scaling factor based on the total depth and max depth
-        float scaleFactor = CalculateScaleFactor(annDepth, maxDepth);
+        float layerScaleFactor = CalculateScaleFactor(annDepth, maxDepth);
+
+        zPosition = -2f;
 
         // Apply the scaling and positioning with adjusted zPosition to each layer
         foreach (GameObject layerObject in instantiatedLayers) {
             layerObject.transform.SetParent(annParent.transform);
-            layerObject.transform.localScale *= scaleFactor;
-            layerObject.transform.localPosition = new Vector3(0f, 1f, zPosition - (layerObject.transform.localScale.z / 2f * scaleFactor));
-            zPosition -= (layerObject.transform.localScale.z * scaleFactor + spaceBetweenLayers);
+            layerObject.transform.localScale *= layerScaleFactor;
+            layerObject.transform.localPosition = new Vector3(0f, 1f, zPosition - (layerObject.transform.localScale.z / 2f * layerScaleFactor));
+            zPosition -= (layerObject.transform.localScale.z * layerScaleFactor + spaceBetweenLayers * layerScaleFactor);
         }
 
         // Adjust the total depth after positioning
@@ -319,7 +403,7 @@ public class GetApiData : MonoBehaviour {
     // Calculate the scaling factor based on actual and maximum depth
     float CalculateScaleFactor(float annDepth, float maxDepth) {
         // Scale down if the total depth exceeds the maximum, else use actual size
-        return annDepth > maxDepth ? maxDepth / annDepth : 1f;
+         return annDepth > maxDepth ? maxDepth / annDepth : 1f;
     }
 
     void ConfigureInteractable(XRSimpleInteractable interactable) {
@@ -327,14 +411,18 @@ public class GetApiData : MonoBehaviour {
     }
 
     // Configure the interaction script for a layer
-    void ConfigureInteractionScript(LayerInteraction interactionScript, LayerInfo layer) {
+    void ConfigureInteractionScript(LayerInteraction interactionScript, LayerInfo layer, GameObject layerParent) {
         interactionScript.hoverMaterial = hoverMaterial;
         interactionScript.typeText =  typeText;
         interactionScript.indexText = indexText;
         interactionScript.outputShapeText = outputShapeText;
         interactionScript.uiWindow = uiWindow;
         interactionScript.layerInfo = layer;
-
+         // Get and assign the child objects
+        Transform[] children = layerParent.gameObject.GetComponentsInChildren<Transform>(true);
+        interactionScript.childObjects = children.Where(child => child != layerParent.transform)
+                                                .Select(child => child.gameObject)
+                                                .ToArray();
     }
     
     string ArrayToString(int[] array) {

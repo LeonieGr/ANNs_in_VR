@@ -16,6 +16,9 @@ TagManager:
   - Sigmoid
   - ReLU
   - Softmax
+  - Reshape
+  - UpSampling
+  - Concatenate
   layers:
   - Default
   - TransparentFX

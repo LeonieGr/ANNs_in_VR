@@ -4,9 +4,10 @@ using UnityEngine.Networking;
 
 public class ConnectionHandler : MonoBehaviour
 {
-    public string urlToCheck = "http://172.22.27.9:4999/layer_info";
     public GameObject successObject;
     public GameObject failureObject;
+    private string urlToCheck = "http://192.168.2.104:4999/sequential/layer_info";
+
 
     private void Start() {
         StartCoroutine(CheckConnection());

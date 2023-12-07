@@ -8,34 +8,40 @@ using TMPro;
 
 
 public class LayerInteraction : MonoBehaviour {
+
     public Material hoverMaterial; // Shared hover material for all layers
     public GameObject uiWindow; // UI Window to show on trigger
     public TextMeshProUGUI typeText, indexText, outputShapeText;
     public GetApiData.LayerInfo layerInfo;
+    public GameObject [] childObjects;
+    public GameObject testObject;
 
-    private Material originalMaterial; // To store the original material of the layer
-    private Renderer layerRenderer;
+    private Material[] originalChildMaterials; // To store the original materials of the children
 
 
     void Awake() {
-
-        layerRenderer = GetComponent<MeshRenderer>();
-        if (layerRenderer != null) {
-            // Store the original material of this specific layer
-            originalMaterial = layerRenderer.material;
+        // Get the original material of all children of the layer
+        if (childObjects != null) {
+            originalChildMaterials = new Material[childObjects.Length];
+            for (int i = 0; i < childObjects.Length; i++) {
+                Renderer childRenderer = childObjects[i].GetComponent<Renderer>();
+                if (childRenderer != null) {
+                    originalChildMaterials[i] = childRenderer.material;
+                }
+            }
         }
 
         var interactable = GetComponent<XRSimpleInteractable>();
-        Debug.Log(interactable);
+       
+       // Listeners for interactable events
         if (interactable != null) {
             interactable.hoverEntered.AddListener(OnHoverEntered);
             interactable.hoverExited.AddListener(OnHoverExited);
             interactable.activated.AddListener(OnActivateEntered);
-
-            Debug.Log("Listeners are added");
         }
     }
 
+    // Set Texts according to Layer Information
     public void SetLayerInfo () {
         if (layerInfo != null) {
             typeText.text = "Type: " + layerInfo.class_name;
@@ -47,16 +53,28 @@ public class LayerInteraction : MonoBehaviour {
     }
 
     public void OnHoverEntered(HoverEnterEventArgs args) {
-        // Switch to hover material
-        if (layerRenderer != null) {
-            layerRenderer.material = hoverMaterial;
+        // Switch to hover material for each child object
+        if (childObjects != null) {
+            foreach (GameObject child in childObjects) {
+                Renderer childRenderer = child.GetComponent<Renderer>();
+                if (childRenderer != null) {
+                    childRenderer.material = hoverMaterial;
+                }
+            }
         }
     }
 
     public void OnHoverExited(HoverExitEventArgs args) {
-        // Revert to the original material
-        if (layerRenderer != null) {
-            layerRenderer.material = originalMaterial;
+        testObject.SetActive(true);
+       // Revert to the original material for each child object
+        if (childObjects != null) {
+            for (int i = 0; i < childObjects.Length; i++) {
+                Renderer childRenderer = childObjects[i].GetComponent<Renderer>();
+                if (childRenderer != null && i < originalChildMaterials.Length) {
+                    childRenderer.material = originalChildMaterials[i];
+                    Debug.Log("og material back");
+                }
+            }
         }
     }
 
@@ -65,7 +83,7 @@ public class LayerInteraction : MonoBehaviour {
         SetLayerInfo();
     }
 
-     public void CloseUIWindow() {
+    public void CloseUIWindow() {
         uiWindow.SetActive(false);
     }
 
