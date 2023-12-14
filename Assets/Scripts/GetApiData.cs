@@ -11,7 +11,7 @@ using TMPro;
 // GetApiData fetches and visualizes layer information from a specified API endpoint
 public class GetApiData : MonoBehaviour {
 
-    private string apiUrl; //= "http://172.22.27.118:4999/autoencoder/layer_info"; 
+    private string apiUrl = "http://172.22.28.210:4999/sequential/layer_info"; 
     private Dictionary<string, string> modelUrls = new Dictionary<string, string>{
         {"None",""},
         {"Sequential", "http://192.168.2.104:4999/sequential/layer_info"},
@@ -21,6 +21,8 @@ public class GetApiData : MonoBehaviour {
 
     // Conversion factor to translate layer dimensions into Unity units
     private float pixelToUnit = 0.04f;
+    // Current model 
+    private GameObject annParent;
 
     // Prefabs for different types of layers
     public GameObject Conv2DPrefab;
@@ -34,9 +36,9 @@ public class GetApiData : MonoBehaviour {
     public GameObject ConcatenatePrefab;     
 
     // Material of hovered layers
-    public Material hoverMaterial;
+    public Material hoverMaterial, hoverParticleMaterial;
     public GameObject uiWindow; // UI Window to show on trigger
-    public TextMeshProUGUI typeText, indexText, outputShapeText;
+    public TextMeshProUGUI typeText, indexText, outputShapeText, activationText;
 
     //Dropdown menu to choose model
     public TMP_Dropdown modelDropdownEN;
@@ -80,7 +82,7 @@ public class GetApiData : MonoBehaviour {
         // Begin API call
         InitializeDropdown(modelDropdownDE);
         InitializeDropdown(modelDropdownEN);
-        //StartCoroutine(GetLayerInfo());
+        StartCoroutine(GetLayerInfo());
         Debug.Log("GetLayerInfo method is running.");
 
     }
@@ -122,7 +124,7 @@ public class GetApiData : MonoBehaviour {
                 // On success, Parse the JSON response
                 string jsonText = webRequest.downloadHandler.text;
 
-                // Create a wrapper object for the JSON array
+                // Deserealize Jason String 
                 LayerInfoList layerInfoList = JsonUtility.FromJson<LayerInfoList>("{\"layers\":" + jsonText + "}");
 
                 // If response is valid, inistiate layers
@@ -141,7 +143,12 @@ public class GetApiData : MonoBehaviour {
         float zPosition = 0f;
         float spaceBetweenLayers = 1f;
         float annDepth = 0f;
-        GameObject annParent = new GameObject("ANNModel");
+        // Clear the existing model
+        if (annParent != null) {
+            Destroy(annParent);
+        }
+
+        annParent = new GameObject("ANNModel");
         List<GameObject> instantiatedLayers = new List<GameObject>();
 
         // Iterate through each layer and instantiate its visual representation
@@ -192,12 +199,12 @@ public class GetApiData : MonoBehaviour {
         }
     }
 
-    // Check if the layer is of type Dense, Dropout, or Flatten
+    // Check if the layer is fully connected
     bool IsDenseDropoutFlattenLayer(LayerInfo layer) {
         return layer.class_name == "Dense" || layer.class_name == "Dropout" || layer.class_name == "Flatten";
     }
 
-    // Check if the layer is of type Conv2D or MaxPooling2D
+    // Check if the layer is convolutional
     bool IsConvOrPoolingLayer(LayerInfo layer) {
         return layer.class_name == "Conv2D" || layer.class_name == "MaxPooling2D" || layer.class_name == "Concatenate" || layer.class_name == "UpSampling2D" || layer.class_name == "Reshape" || layer.class_name == "InputLayer";
     }
@@ -210,7 +217,7 @@ public class GetApiData : MonoBehaviour {
 
         // Instantiate the prefab with the particle system
         GameObject neuronSystem = Instantiate(prefab, parent: layerParent.transform);
-        neuronSystem.transform.localPosition = new Vector3(0, 3, 0);
+        neuronSystem.transform.localPosition = new Vector3(0, 3.5f, 0);
 
         // Get the particle system components of the children
         ParticleSystem[] particleSystemArray = neuronSystem.GetComponentsInChildren<ParticleSystem>();
@@ -228,21 +235,23 @@ public class GetApiData : MonoBehaviour {
             mainModule.startLifetime = Mathf.Infinity;
             mainModule.startSpeed = 0f;
             emissionModule.rateOverTime = 0f;
-
+ 
             // Special handeling for last layer: horizontal, increased size, lower positioning
             if (isLastLayer) {
                 neuronSystem.transform.localPosition = new Vector3(0, 0, 0);
-                shapeModule.rotation = new Vector3(shapeModule.rotation.x, shapeModule.rotation.y, 0f);
+                neuronSystem.transform.rotation = Quaternion.Euler(new Vector3(90, 90, 0));
+               // shapeModule.rotation = new Vector3(shapeModule.rotation.x, shapeModule.rotation.y, 0f);
                 particleRenderer.maxParticleSize = 0.07f;
             }
 
             // Configure a burst to emit the exact number of particles once
-            ParticleSystem.Burst burst = new ParticleSystem.Burst(0.0f, (short)numberOfNeurons);
+            ParticleSystem.Burst burst = new ParticleSystem.Burst(0.0f, numberOfNeurons);
             emissionModule.SetBursts(new ParticleSystem.Burst[] { burst });
+
         }  
     }
 
-    // Instantiate feature maps for convolutional and pooling layers
+    // Instantiate feature maps for convolutional layers
     void InstantiateFeatureMaps(LayerInfo layer, GameObject prefab, GameObject layerParent) {
         if (layer.output_shape != null) {
 
@@ -278,6 +287,7 @@ public class GetApiData : MonoBehaviour {
         BoxCollider collider = layerObject.AddComponent<BoxCollider>();
         collider.size = CalculateBoundsSize(layerObject);
         collider.center = CalculateBoundsCenter(layerObject);
+        collider.isTrigger = true; 
     }
 
     // Calculate the bounds size for the collider based on renderers
@@ -311,12 +321,9 @@ public class GetApiData : MonoBehaviour {
             if (IsConvOrPoolingLayer(layers[i])) {
                 // Calculate layer size and apply a sigmoid-based scaling factor
                 float layerSize = CalculateLayerSize(instantiatedLayers[i]);
-                Debug.Log(layerSize); // bound size
                 float layerScaleFactor = SigmoidScale(layerSize); 
-                float adjustmentFactor = 10.0f / layerSize;
+                //float adjustmentFactor = 10.0f / layerSize;
                 //layerScaleFactor *= adjustmentFactor;
-                 Debug.Log("Factor:" + layerScaleFactor);
-
 
                 Vector3 currentScale = instantiatedLayers[i].transform.localScale;
                 instantiatedLayers[i].transform.localScale = new Vector3(  
@@ -413,16 +420,23 @@ public class GetApiData : MonoBehaviour {
     // Configure the interaction script for a layer
     void ConfigureInteractionScript(LayerInteraction interactionScript, LayerInfo layer, GameObject layerParent) {
         interactionScript.hoverMaterial = hoverMaterial;
+        interactionScript.hoverParticleMaterial = hoverParticleMaterial;
         interactionScript.typeText =  typeText;
         interactionScript.indexText = indexText;
         interactionScript.outputShapeText = outputShapeText;
+        interactionScript.activationText = activationText;
         interactionScript.uiWindow = uiWindow;
         interactionScript.layerInfo = layer;
+        interactionScript.isNeuronLayer = IsDenseDropoutFlattenLayer(layer);
          // Get and assign the child objects
         Transform[] children = layerParent.gameObject.GetComponentsInChildren<Transform>(true);
+
         interactionScript.childObjects = children.Where(child => child != layerParent.transform)
                                                 .Select(child => child.gameObject)
                                                 .ToArray();
+
+        interactionScript.Initialize();
+
     }
     
     string ArrayToString(int[] array) {

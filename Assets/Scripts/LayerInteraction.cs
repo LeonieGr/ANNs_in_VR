@@ -9,17 +9,18 @@ using TMPro;
 
 public class LayerInteraction : MonoBehaviour {
 
-    public Material hoverMaterial; // Shared hover material for all layers
+    public Material hoverMaterial, hoverParticleMaterial; // Shared hover material for all layers
     public GameObject uiWindow; // UI Window to show on trigger
-    public TextMeshProUGUI typeText, indexText, outputShapeText;
+    public TextMeshProUGUI typeText, indexText, outputShapeText, activationText;
     public GetApiData.LayerInfo layerInfo;
     public GameObject [] childObjects;
     public GameObject testObject;
+    public bool isNeuronLayer;
 
     private Material[] originalChildMaterials; // To store the original materials of the children
 
 
-    void Awake() {
+    public void Initialize() {
         // Get the original material of all children of the layer
         if (childObjects != null) {
             originalChildMaterials = new Material[childObjects.Length];
@@ -47,25 +48,32 @@ public class LayerInteraction : MonoBehaviour {
             typeText.text = "Type: " + layerInfo.class_name;
             indexText.text = "Index: " + layerInfo.index;
             outputShapeText.text = "Output Shape: " + ArrayToString(layerInfo.output_shape);
+            if (layerInfo.activation != null) {
+                activationText.text = "Activation Function: " + layerInfo.activation;
+            }
         } else {
             Debug.LogError("Layer info is null");
         }
     }
 
     public void OnHoverEntered(HoverEnterEventArgs args) {
+
         // Switch to hover material for each child object
         if (childObjects != null) {
             foreach (GameObject child in childObjects) {
                 Renderer childRenderer = child.GetComponent<Renderer>();
                 if (childRenderer != null) {
-                    childRenderer.material = hoverMaterial;
+                    if (isNeuronLayer){
+                        childRenderer.material = hoverParticleMaterial;
+                    } else {
+                        childRenderer.material = hoverMaterial;
+                    }
                 }
             }
         }
     }
 
     public void OnHoverExited(HoverExitEventArgs args) {
-        testObject.SetActive(true);
        // Revert to the original material for each child object
         if (childObjects != null) {
             for (int i = 0; i < childObjects.Length; i++) {
@@ -99,6 +107,5 @@ public class LayerInteraction : MonoBehaviour {
             interactable.activated.RemoveListener(OnActivateEntered);
         }
     }
-    
 }
 
