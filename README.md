@@ -48,5 +48,3 @@ The application boasts several key features:
 - **Model Visualization**: Central area for immersive model visualization and interaction.
 
 ## Contributing
-
-Contributions to this project are welcome! If you're interested in enhancing the application or suggesting improvements...
