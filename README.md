@@ -47,4 +47,11 @@ The application boasts several key features:
 - **Educational Content**: Learn about neural networks, layer functions, and activation functions in a dedicated area.
 - **Model Visualization**: Central area for immersive model visualization and interaction.
 
+<p align="center">
+  <img src="Images/vgg.jpg" alt="Image 1" width="210"/>
+  <img src="Images/MainUI.jpg" alt="Image 2" width="340"/>
+  <img src="Images/AddUI.jpg" alt="Image 3" width="300"/>
+</p>
+
+
 ## Contributing
