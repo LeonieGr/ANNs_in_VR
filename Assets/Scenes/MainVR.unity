@@ -675,7 +675,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.5000318, y: -11}
+  m_AnchoredPosition: {x: 0.5000318, y: -9}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &31150544
@@ -1672,7 +1672,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 76931616}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 361920644}
+        m_TargetAssemblyTypeName: ButtonDisableOnClick, Assembly-CSharp
+        m_MethodName: whenButtonClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &76931616
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2308,7 +2320,9 @@ MonoBehaviour:
   - {fileID: 883099990}
   - {fileID: 1686481831}
   - {fileID: 1970448482}
-  - {fileID: 0}
+  - {fileID: 787052623}
+  - {fileID: 831471291}
+  - {fileID: 923268407}
   - {fileID: 1819775033}
 --- !u!114 &98420095
 MonoBehaviour:
@@ -2328,7 +2342,9 @@ MonoBehaviour:
   - {fileID: 883099990}
   - {fileID: 1686481831}
   - {fileID: 1970448482}
-  - {fileID: 0}
+  - {fileID: 787052623}
+  - {fileID: 831471291}
+  - {fileID: 923268407}
   disableText: {fileID: 1502381729}
   button: {fileID: 1819775033}
 --- !u!114 &98420096
@@ -2418,7 +2434,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.5000318, y: -13.7}
+  m_AnchoredPosition: {x: 0.5000318, y: -9.2}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &105905240
@@ -3147,8 +3163,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Hi there,\nhave  you ever wondered how an Artifical Neural Network really
-    looks like? \n\nHere you can choose between different ANNs and explore them from
+  m_text: "Hi there,\nhave  you ever wondered how an Artifical Neural Network looks
+    like? \n\nHere you can choose between different Networks and explore them from
     all angles.\n\nHave Fun!"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7e408bb4dd2be4eae8b27e4c22846d5d, type: 2}
@@ -4550,8 +4566,7 @@ MonoBehaviour:
     das Gegenteil von Pooling-Operationen wie MaxPooling, welche die r\xE4umlichen
     Dimensionen reduzieren. Diese Schicht ist besonders n\xFCtzlich in Netzwerkarchitekturen,
     die eine Erh\xF6hung der Aufl\xF6sung von Merkmalskarten erfordern, wie beispielsweise
-    im Dekodiererteil eines Autoencoders oder in GANs (Generative Adversarial Networks)
-    zur Erzeugung von Bildern mit h\xF6herer Aufl\xF6sung."
+    im Dekodiererteil eines Autoencoders."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7e408bb4dd2be4eae8b27e4c22846d5d, type: 2}
   m_sharedMaterial: {fileID: -3392141607609104500, guid: 7e408bb4dd2be4eae8b27e4c22846d5d,
@@ -7109,7 +7124,9 @@ MonoBehaviour:
   - {fileID: 2047635158}
   - {fileID: 1928989046}
   - {fileID: 1385116798}
-  - {fileID: 0}
+  - {fileID: 1645660029}
+  - {fileID: 1743109121}
+  - {fileID: 1597569353}
   disableText: {fileID: 795376271}
   button: {fileID: 1362478}
 --- !u!114 &361920645
@@ -7145,7 +7162,9 @@ MonoBehaviour:
   - {fileID: 2047635158}
   - {fileID: 1928989046}
   - {fileID: 1385116798}
-  - {fileID: 0}
+  - {fileID: 1645660029}
+  - {fileID: 1743109121}
+  - {fileID: 1597569353}
   - {fileID: 1362478}
 --- !u!1 &368100576
 GameObject:
@@ -7527,7 +7546,6 @@ GameObject:
   - component: {fileID: 377909836}
   - component: {fileID: 377909835}
   - component: {fileID: 377909837}
-  - component: {fileID: 377909838}
   m_Layer: 0
   m_Name: Model
   m_TagString: Untagged
@@ -7603,7 +7621,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hoverMaterial: {fileID: 2100000, guid: 958676e2b6cfd46ceb1a8e3f591ed3f9, type: 2}
-  hoverParticleMaterial: {fileID: 0}
+  hoverParticleMaterial: {fileID: 2100000, guid: 268c6918e5ebe423e9e6898cd2b7edf5,
+    type: 2}
   uiWindow: {fileID: 540678588}
   typeText: {fileID: 3377278829688677145}
   indexText: {fileID: 3377278829688677144}
@@ -7619,24 +7638,6 @@ MonoBehaviour:
   childObjects: []
   testObject: {fileID: 0}
   isNeuronLayer: 0
---- !u!114 &377909838
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 377909834}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b3762971c71a4d2baa52eae2b70c0ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  layerPrefab: {fileID: 753996198103100780, guid: 70d5ff9600a3942698bb3ed484a5387f,
-    type: 3}
-  hoverMaterial: {fileID: 2100000, guid: 958676e2b6cfd46ceb1a8e3f591ed3f9, type: 2}
-  originalMaterial: {fileID: 0}
-  layerRenderer: {fileID: 0}
-  uiWindow: {fileID: 540678588}
 --- !u!1 &396773622
 GameObject:
   m_ObjectHideFlags: 0
@@ -7720,7 +7721,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 396773625}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 98420095}
+        m_TargetAssemblyTypeName: ButtonDisableOnClick, Assembly-CSharp
+        m_MethodName: whenButtonClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &396773625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8014,9 +8027,10 @@ MonoBehaviour:
     \xDCberanpassung in neuronalen Netzwerken zu vermeiden. W\xE4hrend des Trainings
     setzt sie zuf\xE4llig einen Teil der Neuronen au\xDFer Betrieb, indem sie deren
     Ausgaben auf null setzt. Dies zwingt das Netzwerk, robuster zu arbeiten und verringert
-    die Abh\xE4ngigkeit von bestimmten Neuronen, was letztendlich die Verallgemeinerungsf\xE4higkeit
-    auf unbekannte Daten verbessert. Dropout wird h\xE4ufig nach Dense Layern  angewandt,
-    kann aber je nach Bedarf auch an anderen Stellen im Netzwerk eingesetzt werden."
+    die Abh\xE4ngigkeit von bestimmten Neuronen, was letztendlich die Verallgemeinerungs-
+    f\xE4higkeit auf unbekannte Daten verbessert. Dropout wird h\xE4ufig nach Dense
+    Layern  angewandt, kann aber je nach Bedarf auch an anderen Stellen im Netzwerk
+    eingesetzt werden."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7e408bb4dd2be4eae8b27e4c22846d5d, type: 2}
   m_sharedMaterial: {fileID: -3392141607609104500, guid: 7e408bb4dd2be4eae8b27e4c22846d5d,
@@ -8044,8 +8058,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 6
-  m_fontSizeBase: 6
+  m_fontSize: 5
+  m_fontSizeBase: 5
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -10353,7 +10367,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.5000318, y: -11.5}
+  m_AnchoredPosition: {x: 0.5000318, y: -8.7}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &533349325
@@ -10409,8 +10423,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 5
-  m_fontSizeBase: 5
+  m_fontSize: 4.7
+  m_fontSizeBase: 4.7
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -10626,8 +10640,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 6
-  m_fontSizeBase: 6
+  m_fontSize: 5
+  m_fontSizeBase: 5
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -12715,7 +12729,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.5000318, y: -7.99999}
+  m_AnchoredPosition: {x: 0.5000318, y: -7.3}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &609094520
@@ -12740,12 +12754,10 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Dense Layer , auch vollvernetzte Schichten genannt, stellen eine Verbindung
     zwischen jedem Neuron in einer Schicht und allen Neuronen in der vorangehenden
-    Schicht her. Sie sind typischerweise am Abschluss einer Netzwerkarchitektur in
-    k\xFCnstlichen neuronalen Netzwerke anzutreffen. Diese Schichten f\xFChren eine
-    gewichtete Addition der Eingangssignale durch und setzen Aktivierungsfunktionen
-    ein, um die finale Ausgabe oder Prognose zu berechnen. Sie spielen eine wesentliche
-    Rolle bei der Formulierung von komplexen Entscheidungen, basierend auf den analysierten
-    Merkmalen."
+    Schicht her. Sie sind typischerweise am Abschluss einer Netzwerkarchitektur anzutreffen.
+    Diese Schichten f\xFChren eine gewichtete Addition der Eingangssignale durch
+    und setzen Aktivierungsfunktionen ein, um die finale Ausgabe oder Prognose zu
+    berechnen."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7e408bb4dd2be4eae8b27e4c22846d5d, type: 2}
   m_sharedMaterial: {fileID: -3392141607609104500, guid: 7e408bb4dd2be4eae8b27e4c22846d5d,
@@ -12773,8 +12785,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 6
-  m_fontSizeBase: 6
+  m_fontSize: 5.5
+  m_fontSizeBase: 5.5
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -13424,8 +13436,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "Hi, \nhast du dich jemals gefragt, wie ein K\xFCnstliches Neuronales Netzwerk
-    wirklich aussieht?\n\nHier kannst du zwischen verschiedenen ANNs w\xE4hlen und
-    sie aus allen Winkeln erkunden.\n\nViel Spa\xDF!"
+    aussieht?\n\nHier kannst du zwischen verschiedenen Netzwerken w\xE4hlen und sie
+    aus allen Winkeln erkunden.\n\nViel Spa\xDF!"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7e408bb4dd2be4eae8b27e4c22846d5d, type: 2}
   m_sharedMaterial: {fileID: -3392141607609104500, guid: 7e408bb4dd2be4eae8b27e4c22846d5d,
@@ -13684,11 +13696,10 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Die Reshape Layer  dient dazu, die Form der Eingabedaten in eine festgelegte
     Struktur zu \xE4ndern, ohne dabei die Daten selbst zu modifizieren. Diese Schicht
-    wird eingesetzt, wenn die Dimensionen der Daten angepasst werden m\xFCssen, um
-    den Anforderungen unterschiedlicher Bereiche des neuronalen Netzwerks gerecht
-    zu werden. Beispielsweise k\xF6nnte man Daten von einem zweidimensionalen in
-    ein eindimensionales Format umwandeln, bevor man sie an eine Schicht weitergibt,
-    die eine flache Eingabe, wie etwa eine fully-connected Layer, erwartet."
+    wird eingesetzt, wenn die Dimensionen der Daten angepasst werden m\xFCssen. Beispielsweise
+    k\xF6nnte man Daten von einem zweidimensionalen in ein eindimensionales Format
+    umwandeln, bevor man sie an eine Schicht weitergibt, die eine flache Eingabe,
+    wie etwa eine fully-connected Layer, erwartet."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7e408bb4dd2be4eae8b27e4c22846d5d, type: 2}
   m_sharedMaterial: {fileID: -3392141607609104500, guid: 7e408bb4dd2be4eae8b27e4c22846d5d,
@@ -14023,7 +14034,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 671262698}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 98420095}
+        m_TargetAssemblyTypeName: ButtonDisableOnClick, Assembly-CSharp
+        m_MethodName: whenButtonClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &671262698
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14226,7 +14249,7 @@ RectTransform:
   m_GameObject: {fileID: 692666267}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.4, y: 0.4, z: 0.4}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1456555196}
@@ -14237,7 +14260,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 3.9}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &696953367
@@ -14767,7 +14790,7 @@ RectTransform:
   m_GameObject: {fileID: 714646657}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0}
-  m_LocalScale: {x: 0.40000007, y: 0.39999998, z: 0.40000007}
+  m_LocalScale: {x: 0.3700001, y: 0.3700001, z: 0.3700001}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1227057480}
@@ -14775,7 +14798,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 22.9, y: 7.5}
+  m_AnchoredPosition: {x: 22.9, y: 9.2}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &714646659
@@ -17914,7 +17937,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Model
+  m_text: Sequential
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7e408bb4dd2be4eae8b27e4c22846d5d, type: 2}
   m_sharedMaterial: {fileID: -3392141607609104500, guid: 7e408bb4dd2be4eae8b27e4c22846d5d,
@@ -19695,13 +19718,13 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "Aktivierungsfunktionen verleihen neuronalen Netzwerken nicht-lineare Eigenschaften.
-    Diese Funktionen sind unerl\xE4sslich, da sie es den Netzwerken erm\xF6glichen,
-    Problemstellungen zu bew\xE4ltigen, die \xFCber das, was mit einfachen linearen
-    Gleichungen m\xF6glich ist, hinausgehen. Innerhalb des Netzwerks empf\xE4ngt
-    jedes Neuron Signale von den vorangegangenen Neuronen. Diese Signale werden gewichtet
-    und aufsummiert, bevor sie durch die Aktivierungsfunktion geleitet werden. Die
-    Aufgabe der Aktivierungsfunktion ist es, die eingehende Summe in ein Ausgangssignal
-    umzuwandeln. Dieses Signal wird dann an die n\xE4chste Schicht im Netzwerk weitergeleitet."
+    Diese Funktionen erm\xF6glichen den Netzwerken, Problemstellungen zu bew\xE4ltigen,
+    die \xFCber das, was mit einfachen linearen Gleichungen m\xF6glich ist, hinausgehen.
+    Innerhalb des Netzwerks empf\xE4ngt jedes Neuron Signale von den vorangegangenen
+    Neuronen. Diese Signale werden gewichtet und aufsummiert, bevor sie durch die
+    Aktivierungsfunktion geleitet werden. Die Aufgabe der Aktivierungsfunktion ist
+    es, die eingehende Summe in ein Ausgangssignal umzuwandeln. Dieses Signal wird
+    dann an die n\xE4chste Schicht im Netzwerk weitergeleitet."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7e408bb4dd2be4eae8b27e4c22846d5d, type: 2}
   m_sharedMaterial: {fileID: -3392141607609104500, guid: 7e408bb4dd2be4eae8b27e4c22846d5d,
@@ -19729,8 +19752,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 5.5
-  m_fontSizeBase: 5.5
+  m_fontSize: 5
+  m_fontSizeBase: 5
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -20703,7 +20726,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.5000318, y: -7.99999}
+  m_AnchoredPosition: {x: 0.5000318, y: -8.3}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1063995301
@@ -20726,15 +20749,15 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "K\xFCnstliche Neuronale Netzwerke, auch KNNs genannt, sind mathematische
-    Modelle, die von der Struktur und Funktionsweise biologischer neuronaler Netzwerke
-    inspiriert sind. KNNs bestehen aus vernetzten Knotenpunkten (Neuronen), die in
-    Schichten (Layer) organisiert sind. Informationen werden durch diese Verbindungen
-    verarbeitet und \xFCbertragen, wodurch KNNs in der Lage sind, verschiedene Aufgaben
-    wie Klassifizierung, Regression und Mustererkennung auszuf\xFChren. KNNs k\xF6nnen
-    trainiert werden, um aus Daten zu lernen und ihre internen Parameter anzupassen,
-    was sie zu einer grundlegenden Technologie im Bereich des maschinellen Lernens
-    und der k\xFCnstlichen Intelligenz macht."
+  m_text: "K\xFCnstliche Neuronale Netzwerke (KNNs) sind mathematische Modelle, die
+    von der Struktur und Funktionsweise biologischer neuronaler Netzwerke inspiriert
+    sind. KNNs bestehen aus vernetzten Knotenpunkten (Neuronen), die in Schichten
+    (Layer) organisiert sind. Informationen werden durch diese Verbindungen verarbeitet,
+    wodurch KNNs in der Lage sind, verschiedene Aufgaben wie Klassifizierung, Regression
+    und Mustererkennung auszuf\xFChren. KNNs k\xF6nnen trainiert werden, um aus Daten
+    zu lernen und ihre internen Parameter anzupassen, was sie zu einer grundlegenden
+    Technologie im Bereich des maschinellen Lernens und der k\xFCnstlichen Intelligenz
+    macht."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7e408bb4dd2be4eae8b27e4c22846d5d, type: 2}
   m_sharedMaterial: {fileID: -3392141607609104500, guid: 7e408bb4dd2be4eae8b27e4c22846d5d,
@@ -20762,8 +20785,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 5.1
-  m_fontSizeBase: 5.1
+  m_fontSize: 5.05
+  m_fontSizeBase: 5.05
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -25690,8 +25713,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 5
-  m_fontSizeBase: 5
+  m_fontSize: 4.6
+  m_fontSizeBase: 4.6
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -26094,7 +26117,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1271573579}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 98420095}
+        m_TargetAssemblyTypeName: ButtonDisableOnClick, Assembly-CSharp
+        m_MethodName: whenButtonClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1271573579
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26966,7 +27001,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1313868300}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 361920644}
+        m_TargetAssemblyTypeName: ButtonDisableOnClick, Assembly-CSharp
+        m_MethodName: whenButtonClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1313868300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29458,7 +29505,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1369931802
 RectTransform:
   m_ObjectHideFlags: 0
@@ -31028,7 +31075,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1490331857
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32372,7 +32419,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.5, y: -8}
+  m_AnchoredPosition: {x: 0.5, y: -8.8}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1533004193
@@ -32399,10 +32446,9 @@ MonoBehaviour:
     Neuronen im menschlichen Gehirn und Nervensystem. Sie spielen eine zentrale Rolle
     bei der Verarbeitung und Weiterleitung von Informationen durch den K\xF6rper.
     Neuronen tauschen Informationen durch elektrische Impulse und chemische Signale
-    aus, was die Basis f\xFCr Kognition, Wahrnehmung und menschliches Verhalten bildet.
-    Die Erforschung dieser biologischen Netzwerke liefert wertvolle Erkenntnisse
-    \xFCber die Funktionsweise des Gehirns und inspiriert die Entwicklung k\xFCnstlicher
-    neuronaler Netzwerke (KNNs)."
+    aus, was die Basis f\xFCr Kognition, Wahrnehmung und menschliches Verhalten bildet..
+    Die Erkenntnisse \xFCber die Funktionsweisen biologischer Netzwerke inspiriert
+    die Entwicklung k\xFCnstlicher neuronaler Netzwerke (KNNs)."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7e408bb4dd2be4eae8b27e4c22846d5d, type: 2}
   m_sharedMaterial: {fileID: -3392141607609104500, guid: 7e408bb4dd2be4eae8b27e4c22846d5d,
@@ -32430,8 +32476,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 5.5
-  m_fontSizeBase: 5.5
+  m_fontSize: 5.4
+  m_fontSizeBase: 5.4
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -33298,9 +33344,8 @@ GameObject:
   - component: {fileID: 1589135123}
   - component: {fileID: 1589135126}
   - component: {fileID: 1589135125}
-  - component: {fileID: 1589135124}
   m_Layer: 5
-  m_Name: Text Start (blink)
+  m_Name: 'Text Start '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33326,20 +33371,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -14.6}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1589135124
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1589135122}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4172aa165afb4327b0ad420014442ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  textToBlink: {fileID: 1589135125}
-  blinkInterval: 2
 --- !u!114 &1589135125
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33472,7 +33503,7 @@ RectTransform:
   m_GameObject: {fileID: 1592730660}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.4, y: 0.4, z: 0.4}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 922536584}
@@ -33483,7 +33514,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 2.1}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1592730662
@@ -35094,9 +35125,8 @@ GameObject:
   - component: {fileID: 1670697250}
   - component: {fileID: 1670697253}
   - component: {fileID: 1670697252}
-  - component: {fileID: 1670697251}
   m_Layer: 5
-  m_Name: Text Start (blink)
+  m_Name: Text Start
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35122,20 +35152,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -14.6}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1670697251
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1670697249}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4172aa165afb4327b0ad420014442ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  textToBlink: {fileID: 1670697252}
-  blinkInterval: 2
 --- !u!114 &1670697252
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36261,8 +36277,7 @@ MonoBehaviour:
     eingesetzt. Sie verkleinern die Feature Maps, indem sie entweder den maximalen
     (Max-Pooling) oder den durchschnittlichen (Durchschnitts-Pooling) Wert innerhalb
     kleiner Bereiche des Inputs ausw\xE4hlen. Pooling tr\xE4gt dazu bei, die r\xE4umlichen
-    Dimensionen zu reduzieren, die Translationsinvarianz zu verbessern und die Anzahl
-    der Parameter im Netzwerk zu verringern."
+    Dimensionen zu reduzieren und die Anzahl der Parameter im Netzwerk zu verringern."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7e408bb4dd2be4eae8b27e4c22846d5d, type: 2}
   m_sharedMaterial: {fileID: -3392141607609104500, guid: 7e408bb4dd2be4eae8b27e4c22846d5d,
@@ -36290,8 +36305,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 6
-  m_fontSizeBase: 6
+  m_fontSize: 5
+  m_fontSizeBase: 5
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -37338,7 +37353,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1784511153}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 361920644}
+        m_TargetAssemblyTypeName: ButtonDisableOnClick, Assembly-CSharp
+        m_MethodName: whenButtonClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1784511153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42439,7 +42466,7 @@ MonoBehaviour:
     mehrdimensionalen Format, wie den Feature Maps aus Convolutional Layer, in einen
     eindimensionalen Vektor umwandelt. Sie wird oft eingesetzt, um die Verbindung
     zwischen Convolutional und Dense Layer zu schaffen, da Dense Layer eindimensionale
-    Eingaben ben\xF6tigen.\""
+    Eingaben ben\xF6tigen."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7e408bb4dd2be4eae8b27e4c22846d5d, type: 2}
   m_sharedMaterial: {fileID: -3392141607609104500, guid: 7e408bb4dd2be4eae8b27e4c22846d5d,
