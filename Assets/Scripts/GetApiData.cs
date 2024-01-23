@@ -11,12 +11,12 @@ using TMPro;
 // GetApiData fetches and visualizes layer information from a specified API endpoint
 public class GetApiData : MonoBehaviour {
 
-    private string apiUrl = "http://172.22.28.210:4999/sequential/layer_info"; 
+    private string apiUrl = "http://192.168.71.130:4999"; 
     private Dictionary<string, string> modelUrls = new Dictionary<string, string>{
         {"None",""},
-        {"Sequential", "http://192.168.2.104:4999/sequential/layer_info"},
-        {"Autoencoder", "http://192.168.2.104:4999/autoencoder/layer_info"},
-        {"VGG", "http://192.168.2.104:4999/vgg/layer_info"}
+        {"Sequential", "http://192.168.71.130:4999/sequential/layer_info"},
+        {"Autoencoder", "http://192.168.71.130:4999/autoencoder/layer_info"},
+        {"VGG", "http://192.168.71.130:4999/vgg/layer_info"}
     };
 
     // Conversion factor to translate layer dimensions into Unity units
@@ -322,8 +322,6 @@ public class GetApiData : MonoBehaviour {
                 // Calculate layer size and apply a sigmoid-based scaling factor
                 float layerSize = CalculateLayerSize(instantiatedLayers[i]);
                 float layerScaleFactor = SigmoidScale(layerSize); 
-                //float adjustmentFactor = 10.0f / layerSize;
-                //layerScaleFactor *= adjustmentFactor;
 
                 Vector3 currentScale = instantiatedLayers[i].transform.localScale;
                 instantiatedLayers[i].transform.localScale = new Vector3(  
@@ -347,21 +345,7 @@ public class GetApiData : MonoBehaviour {
             bounds.Encapsulate(renderer.bounds);
         }
         // Return the size in a specific dimension (x-axis in this case)
-        return bounds.size.x; 
-
-       /* Transform[] childTransforms = layerParent.GetComponentsInChildren<Transform>();
-        if (childTransforms.Length == 0) {
-            return 0f;
-        }
-
-        float maxSizeX = childTransforms[0].localScale.x;
-        foreach (Transform childTransform in childTransforms) {
-            maxSizeX = Mathf.Max(maxSizeX, childTransform.localScale.x);
-        }
-
-        // Return the maximum size in the x-axis
-        return maxSizeX;*/
-
+        return bounds.size.x;
     }
 
     // Sigmoid function for scaling layer size
@@ -448,6 +432,11 @@ public class GetApiData : MonoBehaviour {
         // Set Rigidbody properties
         rigidbody.isKinematic = true; // don't want the layer to be affected by physics forces
         rigidbody.useGravity = false;
+    }
+
+    // Make apiUrl accessible from other scripts
+    public string ApiUrl {
+        get { return apiUrl; }
     }
 
     void HandleError(string errorMessage){

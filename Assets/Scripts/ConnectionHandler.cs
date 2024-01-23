@@ -6,10 +6,15 @@ public class ConnectionHandler : MonoBehaviour
 {
     public GameObject successObject;
     public GameObject failureObject;
-    private string urlToCheck = "http://192.168.2.104:4999/sequential/layer_info";
+    private string urlToCheck; //= "http://192.168.2.104:4999";
 
 
     private void Start() {
+
+        // Fetch URL from the main script
+        GetApiData apiDataScript = FindObjectOfType<GetApiData>();
+        urlToCheck = apiDataScript.ApiUrl;
+
         StartCoroutine(CheckConnection());
     }
 
